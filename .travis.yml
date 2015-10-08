@@ -1,2 +1,8 @@
 language: csharp
 solution: oht.sln
+install:
+  - nuget restore oht.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+  
+  - NSubstitute restore oht.sln
+  - NSubstitute install NUnit.Runners -Version 1.9.1.0
