@@ -1,2 +1,4 @@
+*.suo
 *.dll
-obj/Debug/DesignTimeResolveAssemblyReferences.cache
+bin/
+obj/
