@@ -1,5 +1,4 @@
 *.suo
-*.dll
 bin/
 obj/
 .hg/
