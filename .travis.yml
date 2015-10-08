@@ -5,4 +5,4 @@ install:
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
   
   - NSubstitute restore oht.sln
-  - NSubstitute install NUnit.Runners -Version 1.9.1.0
+  - NSubstitute install NSubstitute.Runners -Version 1.9.1.0

@@ -5,4 +5,5 @@ obj/
 .hg/
 .hgignore
 *.exe
+*.user
 
