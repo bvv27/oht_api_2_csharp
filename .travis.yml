@@ -6,3 +6,6 @@ install:
   
   - NSubstitute restore oht.sln
   - NSubstitute install NSubstitute.Runners -Version 1.9.1.0
+  
+  - Newtonsoft.Json restore oht.sln
+  - Newtonsoft.Json install Newtonsoft.Json.Runners -Version 7.0.1
