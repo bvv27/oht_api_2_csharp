@@ -1,0 +1,16 @@
+language: csharp
+solution: oht.sln
+before_install:
+  - sudo apt-get install nunit-console
+before_script:
+  - nuget restore oht.sln
+
+install:
+  - nuget restore oht.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+  
+  - nuget restore oht.sln
+  - nuget install NSubstitute.Runners -Version 1.9.1.0
+  
+  - nuget restore oht.sln
+  - nuget install Newtonsoft.Json.Runners -Version 7.0.1
