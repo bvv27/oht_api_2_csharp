@@ -13,6 +13,7 @@ namespace oht
         [STAThread]
         static void Main()
         {
+            //0001
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormExamples());
