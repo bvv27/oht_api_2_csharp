@@ -1,24 +1,42 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface ITranslateViaMachineTranslationProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string sourceLanguage, string targetLanguage, string sourceContent);
+    }
+    public class TranslateViaMachineTranslationProvider : ITranslateViaMachineTranslationProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string sourceLanguage, string targetLanguage, string sourceContent)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/mt/translate/text?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&source_content={4}"
+                    , publicKey, secretKey, sourceLanguage, targetLanguage, sourceContent);
+                return client.DownloadString(web);
+            }
+        }
+    }
     partial class Ohtapi
     {
+        public ITranslateViaMachineTranslationProvider TranslateViaMachineTranslationProvider;
+
         public TranslateViaMachineTranslationResult TranslateViaMachineTranslation(string sourceLanguage, string targetLanguage, string sourceContent)
         {
             var r = new TranslateViaMachineTranslationResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/mt/translate/text?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&source_content={4}"
-                        , KeyPublic, KeySecret, sourceLanguage, targetLanguage, sourceContent);
-                    string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<TranslateViaMachineTranslationResult>(json);
-                }
+                if (TranslateViaMachineTranslationProvider == null)
+                    TranslateViaMachineTranslationProvider = new TranslateViaMachineTranslationProvider();
+                var json = TranslateViaMachineTranslationProvider.Get(Url, _proxy, KeyPublic, KeySecret, sourceLanguage, targetLanguage, sourceContent);
+                r = JsonConvert.DeserializeObject<TranslateViaMachineTranslationResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
             }
             catch (Exception err)
             {
@@ -27,8 +45,6 @@ namespace oht.lib
             }
             return r;
         }
-
-
     }
 
 
@@ -45,7 +61,7 @@ namespace oht.lib
 
         public override string ToString()
         {
-            return Status.Code + " " + Status.Msg + (Status.Code == 0 ? " " + Result.TranslatedText : "");
+            return Status.Code == 0 ? Status.Msg + (Status.Code == 0 ? " " + Result.TranslatedText : "") : Status.Code + " " + Status.Msg;
         }
     }
     public struct TranslateViaMachineTranslationResultType

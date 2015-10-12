@@ -17,7 +17,7 @@ namespace oht.lib
                     var web = Url + String.Format("/tools/wordcount?public_key={0}&secret_key={1}&resources={2}"
                         ,KeyPublic, KeySecret, resources);
                     string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<GetWordCountResult>(json);
+                    r = JsonConvert.DeserializeObject<GetWordCountResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
                 }
             }
             catch (Exception err)

@@ -26,7 +26,7 @@ namespace oht.lib
 
 
                     string json = Encoding.Default.GetString(client.UploadValues(web, "POST", values));
-                    r = JsonConvert.DeserializeObject<CreateTranscriptionProjectResult>(json);
+                    r = JsonConvert.DeserializeObject<CreateTranscriptionProjectResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
                 }
             }
             catch (Exception err)

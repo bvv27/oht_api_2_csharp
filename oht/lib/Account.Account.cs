@@ -7,18 +7,18 @@ namespace oht.lib
 {
     public interface IAccountProvider
     {
-        string Get(string url, WebProxy proxy, string secretKey, string publicKey);
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey);
     }
     public class AccountProvider : IAccountProvider
     {
-        public string Get(string url, WebProxy proxy, string secretKey, string publicKey)
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey)
         {
             using (var client = new WebClient())
             {
                 if (proxy != null)
                     client.Proxy = proxy;
                 client.Encoding = Encoding.UTF8;
-                var web = url + String.Format("/account?secret_key={0}&public_key={1}", secretKey, publicKey);
+                var web = url + String.Format("/account?public_key={0}&secret_key={1}", publicKey, secretKey);
                 return client.DownloadString(web);
             }
         }
@@ -38,7 +38,7 @@ namespace oht.lib
             {
                 if (AccountProvider == null)
                     AccountProvider = new AccountProvider();
-                var json = AccountProvider.Get(Url, _proxy, KeySecret, KeyPublic);
+                var json = AccountProvider.Get(Url, _proxy, KeyPublic, KeySecret);
                 r = JsonConvert.DeserializeObject<AccountResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
             }
             catch (Exception err)

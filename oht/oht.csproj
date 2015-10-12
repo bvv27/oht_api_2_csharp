@@ -63,6 +63,7 @@
       <DependentUpon>FormExamples.cs</DependentUpon>
     </Compile>
     <Compile Include="lib\Account.Account.cs" />
+    <Compile Include="lib\currency.cs" />
     <Compile Include="lib\MachineTranslation.DetectLanguageViaMachineTranslation.cs" />
     <Compile Include="lib\MachineTranslation.TranslateViaMachineTranslation.cs" />
     <Compile Include="lib\Discover.SupportedExpertises.cs" />
@@ -86,6 +87,10 @@
     <Compile Include="lib\Resources.CreateFileResources.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="tests\MachineTranslation.TranslateViaMachineTranslation.cs" />
+    <Compile Include="tests\MachineTranslation.DetectLanguageViaMachineTranslation.cs" />
+    <Compile Include="tests\Discover.SupportedLanguagePairs.cs" />
+    <Compile Include="tests\Discover.SupportedExpertises.cs" />
     <Compile Include="tests\Discover.SupportedLanguages.cs" />
     <Compile Include="tests\Account.Account.cs" />
     <Compile Include="tests\Tools.cs" />

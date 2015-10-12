@@ -14,9 +14,9 @@ namespace oht.lib
                 using (var client = new System.Net.WebClient())
                 {
                     client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/resources/" + resourceUuid + "?secret_key={0}&public_key={1}&project_id={2}&fetch={3}", KeySecret, KeyPublic, projectId, fetch);
+                    var web = Url + String.Format("/resources/" + resourceUuid + "?public_key={0}&secret_key={1}&project_id={2}&fetch={3}", KeyPublic, KeySecret, projectId, fetch);
                     string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<GetResourceResult>(json);
+                    r = JsonConvert.DeserializeObject<GetResourceResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
                 }
             }
             catch (Exception err)

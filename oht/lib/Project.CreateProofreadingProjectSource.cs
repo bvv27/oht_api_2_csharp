@@ -19,7 +19,7 @@ namespace oht.lib
                         ,KeyPublic, KeySecret, sourceLanguage, sources, wordcount, expertise, callbackUrl, name);
                     var values = new System.Collections.Specialized.NameValueCollection {{"notes", notes}};
                     string json = Encoding.Default.GetString(client.UploadValues(web, "POST", values));
-                    r = JsonConvert.DeserializeObject<CreateProofreadingProjectSourceResult>(json);
+                    r = JsonConvert.DeserializeObject<CreateProofreadingProjectSourceResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
                 }
             }
             catch (Exception err)

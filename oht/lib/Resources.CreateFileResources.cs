@@ -16,13 +16,13 @@ namespace oht.lib
                     client.Encoding = Encoding.UTF8;
                     if (String.IsNullOrWhiteSpace(fileContent))
                     {
-                        var web = Url + String.Format("/resources/file?secret_key={0}&public_key={1}&file_name={2}&file_mime={3}", KeySecret, KeyPublic, fileName, fileMime);
+                        var web = Url + String.Format("/resources/file?public_key={0}&secret_key={1}&file_name={2}&file_mime={3}", KeyPublic, KeySecret, fileName, fileMime);
                         byte[] json = client.UploadFile(web, upload);
                         r = JsonConvert.DeserializeObject<CreateFileResourceResult>(Encoding.UTF8.GetString(json));
                     }
                     else
                     {
-                        var web = Url + String.Format("/resources/file?secret_key={0}&public_key={1}&file_name={2}&file_mime={3}", KeySecret, KeyPublic, fileName, fileMime);
+                        var web = Url + String.Format("/resources/file?public_key={0}&secret_key={1}&file_name={2}&file_mime={3}", KeyPublic, KeySecret, fileName, fileMime);
 
                         var values = new System.Collections.Specialized.NameValueCollection
                         {

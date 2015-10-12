@@ -14,7 +14,7 @@ namespace oht.lib
                 using (var client = new System.Net.WebClient())
                 {
                     client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/resources/" + resourceUuid + "/download?secret_key={0}&public_key={1}&project_id={2}", KeySecret, KeyPublic, projectId);
+                    var web = Url + String.Format("/resources/" + resourceUuid + "/download?public_key={0}&secret_key={1}&project_id={2}", KeyPublic, KeySecret, projectId);
                     r.File = client.DownloadData(web);
                     r.Status.Code = 0;
                     r.Status.Msg = "ok";

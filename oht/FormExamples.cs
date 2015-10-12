@@ -28,8 +28,8 @@ namespace oht
         {
             if (checkRemember.Checked)
             {
-                File.WriteAllText(_fileIni, textPublicKey.Text + @"|" + textSecretKey.Text + @"|" + (checkSandbox.Checked ? "1" : "0") 
-                    + @"|" + textResources.Text + @"|"+ textGetQuoteResources.Text + @"|" + combosource_language.Text 
+                File.WriteAllText(_fileIni, textPublicKey.Text + @"|" + textSecretKey.Text + @"|" + (checkSandbox.Checked ? "1" : "0")
+                    + @"|" + textResources.Text + @"|" + textGetQuoteResources.Text + @"|" + combosource_language.Text
                     + @"|" + combotarget_language.Text + @"|" + textProjectID.Text + @"|" + comboExpertise.Text);
             }
             else
@@ -83,15 +83,12 @@ namespace oht
             OpenFileDialog openFile = new OpenFileDialog();
             if (openFile.ShowDialog() == DialogResult.OK)
             {
-                using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-                {
-                    FileInfo file = new FileInfo(openFile.FileName);
+                FileInfo file = new FileInfo(openFile.FileName);
 
-                    var r = api.Resources(file.FullName, file.Name, "file_mime");
-                    textResources.Text = String.Join(",", r.Results);
-                    textGetQuoteResources.Text = textResources.Text;
-                    MessageBox.Show(r.ToString());
-                }
+                var r = _api.Resources(file.FullName, file.Name, "file_mime");
+                textResources.Text = String.Join(",", r.Results);
+                textGetQuoteResources.Text = textResources.Text;
+                MessageBox.Show(r.ToString());
             }
         }
 
@@ -100,15 +97,12 @@ namespace oht
             OpenFileDialog openFile = new OpenFileDialog();
             if (openFile.ShowDialog() == DialogResult.OK)
             {
-                using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-                {
-                    FileInfo file = new FileInfo(openFile.FileName);
+                FileInfo file = new FileInfo(openFile.FileName);
 
-                    var content = Encoding.Default.GetString(File.ReadAllBytes(openFile.FileName));
-                    var r = api.Resources("", file.Name, "file_mime", content);
-                    textResourcesContent.Text = r.Status.Code == 0 ? r.Results[0] : "";
-                    MessageBox.Show(r.ToString());
-                }
+                var content = Encoding.Default.GetString(File.ReadAllBytes(openFile.FileName));
+                var r = _api.Resources("", file.Name, "file_mime", content);
+                textResourcesContent.Text = r.Status.Code == 0 ? r.Results[0] : "";
+                MessageBox.Show(r.ToString());
             }
         }
 
@@ -119,15 +113,14 @@ namespace oht
                 tools.SetMsg("enter", textResources);
                 return;
             }
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.GetResource(textResources.Text);
-                textFileName.Text = r.Result.FileName;
 
-                if (textFileName.Text == "")
-                    textFileName.Text = String.Format("oht_{0}.txt", textResources.Text);
-                MessageBox.Show(r.ToString());
-            }
+            var r = _api.GetResource(textResources.Text);
+            textFileName.Text = r.Result.FileName;
+
+            if (textFileName.Text == "")
+                textFileName.Text = String.Format("oht_{0}.txt", textResources.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butDownloadResource_Click(object sender, EventArgs e)
@@ -144,52 +137,42 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
+
+            var r = _api.DownloadResource(textResources.Text);
+            if (r.Status.Code == 0)
             {
-                var r = api.DownloadResource(textResources.Text);
-                if (r.Status.Code == 0)
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog
                 {
-                    SaveFileDialog saveFileDialog1 = new SaveFileDialog
-                    {
-                        FilterIndex = 1,
-                        RestoreDirectory = true,
-                        FileName = textFileName.Text
-                    };
+                    FilterIndex = 1,
+                    RestoreDirectory = true,
+                    FileName = textFileName.Text
+                };
 
-                    if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                    {
-                        File.WriteAllBytes(saveFileDialog1.FileName, r.File);
-                    }
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    File.WriteAllBytes(saveFileDialog1.FileName, r.File);
                 }
-
-                MessageBox.Show(r.ToString());
-
-
-
             }
+
+            MessageBox.Show(r.ToString());
         }
 
         private void butSupportedLanguages_Click(object sender, EventArgs e)
         {
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
+            var r = _api.SupportedLanguages();
+            if (r.Status.Code == 0)
             {
-                var r = api.SupportedLanguages();
-                if (r.Status.Code == 0)
+                comboLanguage.Items.Clear();
+                combosource_language.Items.Clear();
+                combotarget_language.Items.Clear();
+                foreach (var str in r.Results)
                 {
-                    comboLanguage.Items.Clear();
-                    combosource_language.Items.Clear();
-                    combotarget_language.Items.Clear();
-                    foreach (var str in r.Results)
-                    {
-                        comboLanguage.Items.Add(str.LanguageCode + "|" + str.LanguageName);
-                        combosource_language.Items.Add(str.LanguageCode);
-                        combotarget_language.Items.Add(str.LanguageCode);
-                    }
+                    comboLanguage.Items.Add(str.LanguageCode + "|" + str.LanguageName);
+                    combosource_language.Items.Add(str.LanguageCode);
+                    combotarget_language.Items.Add(str.LanguageCode);
                 }
-
-
-                MessageBox.Show(r.ToString());
             }
+            MessageBox.Show(r.ToString());
         }
 
         private void butDetectLanguage_Click(object sender, EventArgs e)
@@ -199,11 +182,10 @@ namespace oht
                 tools.SetMsg("enter", textForDetectLanguage);
                 return;
             }
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.DetectLanguageViaMachineTranslation(textForDetectLanguage.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.DetectLanguageViaMachineTranslation(textForDetectLanguage.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butGetQuote_Click(object sender, EventArgs e)
@@ -239,11 +221,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.GetQuote(textGetQuoteResources.Text, textWordcount.Text, combosource_language.Text, combotarget_language.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.GetQuote(textGetQuoteResources.Text, textWordcount.Text, combosource_language.Text, combotarget_language.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butGetWordCount_Click(object sender, EventArgs e)
@@ -255,14 +236,11 @@ namespace oht
             }
 
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.GetWordCount(textGetQuoteResources.Text);
-                textWordcount.Text = r.Status.Code == 0 ? r.Result.Total.Wordcount.ToString() : "";
 
+            var r = _api.GetWordCount(textGetQuoteResources.Text);
+            textWordcount.Text = r.Status.Code == 0 ? r.Result.Total.Wordcount.ToString() : "";
+            MessageBox.Show(r.ToString());
 
-                MessageBox.Show(r.ToString());
-            }
         }
 
         private void butTranslateViaMachineTranslation_Click(object sender, EventArgs e)
@@ -286,20 +264,16 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.TranslateViaMachineTranslation(combosource_language.Text, combotarget_language.Text, textContent.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.TranslateViaMachineTranslation(combosource_language.Text, combotarget_language.Text, textContent.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butSupportedLanguagePairs_Click(object sender, EventArgs e)
         {
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.SupportedLanguagePairs();
-                MessageBox.Show(r.ToString());
-            }
+            var r = _api.SupportedLanguagePairs();
+            MessageBox.Show(r.ToString());
         }
 
         private void butSupportedExpertises_Click(object sender, EventArgs e)
@@ -317,20 +291,19 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.SupportedExpertises(combosource_language.Text, combotarget_language.Text);
-                if (r.Status.Code == 0)
-                {
-                    comboExpertise.Items.Clear();
 
-                    foreach (var str in r.Results)
-                    {
-                        comboExpertise.Items.Add(str.Code + "-" + str.Name);
-                    }
+            var r = _api.SupportedExpertises(combosource_language.Text, combotarget_language.Text);
+            if (r.Status.Code == 0)
+            {
+                comboExpertise.Items.Clear();
+
+                foreach (var str in r.Results)
+                {
+                    comboExpertise.Items.Add(str.Code + "-" + str.Name);
                 }
-                MessageBox.Show(r.ToString());
             }
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butCreateTranslationProject_Click(object sender, EventArgs e)
@@ -361,18 +334,17 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.CreateTranslationProject(combosource_language.Text, combotarget_language.Text, textGetQuoteResources.Text
-                    , "marketing-consumer-media"
-                    , "", "", "", "translation");
 
-                if (r.Status.Code == 0)
-                {
-                    textProjectID.Text = r.Result.ProjectId.ToString();
-                }
-                MessageBox.Show(r.ToString());
+            var r = _api.CreateTranslationProject(combosource_language.Text, combotarget_language.Text, textGetQuoteResources.Text
+                , "marketing-consumer-media"
+                , "", "", "", "translation");
+
+            if (r.Status.Code == 0)
+            {
+                textProjectID.Text = r.Result.ProjectId.ToString();
             }
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butCreateProofreadingProject_Click(object sender, EventArgs e)
@@ -391,15 +363,14 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
+
+            var r = _api.CreateProofreadingProjectSource(combosource_language.Text, textGetQuoteResources.Text, "", "", "marketing-consumer-media", "", "namne12");
+            if (r.Status.Code == 0)
             {
-                var r = api.CreateProofreadingProjectSource(combosource_language.Text, textGetQuoteResources.Text, "", "", "marketing-consumer-media", "", "namne12");
-                if (r.Status.Code == 0)
-                {
-                    textProjectID.Text = r.Result.ProjectId.ToString();
-                }
-                MessageBox.Show(r.ToString());
+                textProjectID.Text = r.Result.ProjectId.ToString();
             }
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butCreateTranslationProjectSaT_Click(object sender, EventArgs e)
@@ -424,11 +395,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.CreateProofreadingProjectSourceAndTarget(combosource_language.Text, combotarget_language.Text, textGetQuoteResources.Text, "");
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.CreateProofreadingProjectSourceAndTarget(combosource_language.Text, combotarget_language.Text, textGetQuoteResources.Text, "");
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butCreateTranscriptionProject_Click(object sender, EventArgs e)
@@ -448,15 +418,14 @@ namespace oht
             }
 
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
+
+            var r = _api.CreateTranscriptionProject(combosource_language.Text, textGetQuoteResources.Text);
+            if (r.Status.Code == 0)
             {
-                var r = api.CreateTranscriptionProject(combosource_language.Text, textGetQuoteResources.Text);
-                if (r.Status.Code == 0)
-                {
-                    textProjectID.Text = r.Result.ProjectId.ToString();
-                }
-                MessageBox.Show(r.ToString());
+                textProjectID.Text = r.Result.ProjectId.ToString();
             }
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butGetProjectDetails_Click(object sender, EventArgs e)
@@ -468,11 +437,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.GetProjectDetails(textProjectID.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.GetProjectDetails(textProjectID.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butCancelProject_Click(object sender, EventArgs e)
@@ -483,11 +451,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.CancelProject(textProjectID.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.CancelProject(textProjectID.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butGetProjectsComments_Click(object sender, EventArgs e)
@@ -498,11 +465,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.GetProjectsComments(textProjectID.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.GetProjectsComments(textProjectID.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butRetrieveProjectRatings_Click(object sender, EventArgs e)
@@ -513,11 +479,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.RetrieveProjectRatings(textProjectID.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.RetrieveProjectRatings(textProjectID.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
         private void butPostNewComment_Click(object sender, EventArgs e)
@@ -528,11 +493,10 @@ namespace oht
                 return;
             }
 
-            using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
-            {
-                var r = api.PostNewProjectComment(textProjectID.Text, textComment.Text);
-                MessageBox.Show(r.ToString());
-            }
+
+            var r = _api.PostNewProjectComment(textProjectID.Text, textComment.Text);
+            MessageBox.Show(r.ToString());
+
         }
 
 

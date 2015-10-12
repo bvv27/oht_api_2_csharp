@@ -17,7 +17,7 @@ namespace oht.lib
                     var web = Url + String.Format("/projects/" + projectId + "?public_key={0}&secret_key={1}"
                         ,KeyPublic, KeySecret);
                     string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<GetProjectDetailsResult>(json);
+                    r = JsonConvert.DeserializeObject<GetProjectDetailsResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
                 }
             }
             catch (Exception err)

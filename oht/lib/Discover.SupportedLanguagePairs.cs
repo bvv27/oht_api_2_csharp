@@ -1,23 +1,40 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface ISupportedLanguagePairsProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey);
+    }
+    public class SupportedLanguagePairsProvider : ISupportedLanguagePairsProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/discover/language_pairs?public_key={0}", publicKey);
+                return client.DownloadString(web);
+            }
+        }
+    }
     partial class Ohtapi
     {
+        public ISupportedLanguagePairsProvider SupportedLanguagePairsProvider;
         public SupportedLanguagePairsResult SupportedLanguagePairs()
         {
             var r = new SupportedLanguagePairsResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/discover/language_pairs?public_key={0}", KeyPublic);
-                    string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<SupportedLanguagePairsResult>(json);
-                }
+                if (SupportedLanguagePairsProvider == null)
+                    SupportedLanguagePairsProvider = new SupportedLanguagePairsProvider();
+                var json = SupportedLanguagePairsProvider.Get(Url, _proxy, KeyPublic);
+                r = JsonConvert.DeserializeObject<SupportedLanguagePairsResult>(json);
             }
             catch (Exception err)
             {
