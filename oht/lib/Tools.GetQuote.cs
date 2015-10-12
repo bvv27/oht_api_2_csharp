@@ -39,46 +39,56 @@ namespace oht.lib
     }
     public struct GetQuoteResult
     {
-
+        [JsonProperty(PropertyName = "status")]
         public StatusType status;
-        public GetQuoteResultType results;
+        [JsonProperty(PropertyName = "results")]
+        public GetQuoteResultType result;
+        [JsonProperty(PropertyName = "resultsArray")]
+        public string[] results;
+        [JsonProperty(PropertyName = "errors")]
         public string[] errors;
 
-        public string ToString()
+        public override string ToString()
         {
             return status.Code == 0 ? status.Msg : status.Code + " " + status.Msg;
         }
     }
     public struct GetQuoteResultType
     {
-
+        [JsonProperty(PropertyName = "currency")]
         public string currency;
-
+        [JsonProperty(PropertyName = "account_username")]
         public string account_username;
-
+        [JsonProperty(PropertyName = "credits")]
         public decimal credits;
+        [JsonProperty(PropertyName = "resources")]
         public GetQuoteResources[] resources;
+        [JsonProperty(PropertyName = "total")]
         public GetQuoteTotal total;
     }
 
     public struct GetQuoteResources
     {
+        [JsonProperty(PropertyName = "price")]
         public decimal price;
-
+        [JsonProperty(PropertyName = "resource")]
         public string resource;
-
+        [JsonProperty(PropertyName = "wordcount")]
         public int wordcount;
-
+        [JsonProperty(PropertyName = "credits")]
         public decimal credits;
-        
-
     }
     public struct GetQuoteTotal
     {
+        [JsonProperty(PropertyName = "net_price")]
         public decimal net_price;
+        [JsonProperty(PropertyName = "transaction_fee")]
         public decimal transaction_fee;
+        [JsonProperty(PropertyName = "price")]
         public decimal price;
+        [JsonProperty(PropertyName = "wordcount")]
         public int wordcount;
+        [JsonProperty(PropertyName = "credits")]
         public decimal credits;
     }
 }

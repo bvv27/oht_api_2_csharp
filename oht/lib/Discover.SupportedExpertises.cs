@@ -1,31 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface ISupportedExpertisesProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey, string sourceLanguage, string targetLanguage);
+    }
+    public class SupportedExpertisesProvider : ISupportedExpertisesProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string sourceLanguage, string targetLanguage)
+        {
+            using (var client = new WebClient())
+            {
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/discover/expertise?public_key={0}&source_language={1}&target_language={2}"
+                    , publicKey, sourceLanguage, targetLanguage);
+                return client.DownloadString(web);
+            }
+        }
+    }
+
     partial class Ohtapi
     {
-        public SupportedExpertisesResult SupportedExpertises(string source_language, string target_language)
+        public ISupportedExpertisesProvider SupportedExpertisesProvider;
+        public SupportedExpertisesResult SupportedExpertises(string sourceLanguage, string targetLanguage)
         {
             var r = new SupportedExpertisesResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = System.Text.Encoding.UTF8;
-                    var web = Url + String.Format("/discover/expertise?public_key={0}&source_language={1}&target_language={2}"
-                        , KeyPublic, source_language, target_language);
-                    string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<SupportedExpertisesResult>(json);
-                }
+                if (SupportedExpertisesProvider == null)
+                    SupportedExpertisesProvider = new SupportedExpertisesProvider();
+                var json = SupportedExpertisesProvider.Get(Url, _proxy, KeyPublic, sourceLanguage, targetLanguage);
+                r = JsonConvert.DeserializeObject<SupportedExpertisesResult>(json);
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -35,22 +49,24 @@ namespace oht.lib
 
     public struct SupportedExpertisesResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public SupportedExpertisesResultType[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public SupportedExpertisesResultType[] results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code == 0 ? status.Msg : status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct SupportedExpertisesResultType
     {
-
-        public string name;
-
-        public string code;
+        [JsonProperty(PropertyName = "name")]
+        public string Name;
+        [JsonProperty(PropertyName = "code")]
+        public string Code;
     }
 
 }

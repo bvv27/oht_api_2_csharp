@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -8,39 +6,35 @@ namespace oht.lib
 {
     partial class Ohtapi
     {
-        public CreateTranslationProjectResult CreateTranslationProject(string source_language, string target_language
-            ,string sources, string expertise, string wordcount="", string notes="", string callback_url="", string name="")
+        public CreateTranslationProjectResult CreateTranslationProject(string sourceLanguage, string targetLanguage
+            ,string sources, string expertise, string wordcount="", string notes="", string callbackUrl="", string name="")
         {
             var r = new CreateTranslationProjectResult();
             try
             {
                 using (var client = new System.Net.WebClient())
                 {
-                    client.Encoding = System.Text.Encoding.UTF8;
+                    client.Encoding = Encoding.UTF8;
                     var web = Url + String.Format("/projects/translation?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&sources={4}&expertise={5}"
-                        , KeyPublic, KeySecret, source_language, target_language, sources, expertise);
+                        , KeyPublic, KeySecret, sourceLanguage, targetLanguage, sources, expertise);
 
 
-                    var values = new System.Collections.Specialized.NameValueCollection();
-                    values.Add("wordcount", wordcount);
-                    values.Add("notes", notes);
-                    values.Add("callback_url", callback_url);
-                    values.Add("name", name);
- 
+                    var values = new System.Collections.Specialized.NameValueCollection
+                    {
+                        {"wordcount", wordcount},
+                        {"notes", notes},
+                        {"callback_url", callbackUrl},
+                        {"name", name}
+                    };
+
                     string json = Encoding.Default.GetString(client.UploadValues(web,"POST", values));
                     r = JsonConvert.DeserializeObject<CreateTranslationProjectResult>(json);
-
-
-                    //var web = Url + String.Format("/projects/translation?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&sources={4}&wordcount={5}&notes={6}&expertise={7}&callback_url={8}&name={9}"
-                    //    ,KeyPublic, KeySecret, source_language, target_language, sources, wordcount, notes, expertise, callback_url, name);
-                    //string json = client.DownloadString(web);
-                    //r = JsonConvert.DeserializeObject<CreateTranslationProjectResult>(json);
                 }
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -50,21 +44,28 @@ namespace oht.lib
 
     public struct CreateTranslationProjectResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public CreateTranslationProjectType Result;
+        [JsonProperty(PropertyName = "resultsArray")]
+        public string[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public CreateTranslationProjectType results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code == 0 ? status.Msg : status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct CreateTranslationProjectType
     {
-        public int project_id;
-        public int wordcount;
-        public decimal credits;
+        [JsonProperty(PropertyName = "project_id")]
+        public int ProjectId;
+        [JsonProperty(PropertyName = "wordcount")]
+        public int Wordcount;
+        [JsonProperty(PropertyName = "credits")]
+        public decimal Credits;
     }
 
 

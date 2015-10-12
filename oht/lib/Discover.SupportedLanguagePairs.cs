@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -15,7 +13,7 @@ namespace oht.lib
             {
                 using (var client = new System.Net.WebClient())
                 {
-                    client.Encoding = System.Text.Encoding.UTF8;
+                    client.Encoding = Encoding.UTF8;
                     var web = Url + String.Format("/discover/language_pairs?public_key={0}", KeyPublic);
                     string json = client.DownloadString(web);
                     r = JsonConvert.DeserializeObject<SupportedLanguagePairsResult>(json);
@@ -23,8 +21,8 @@ namespace oht.lib
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -33,33 +31,39 @@ namespace oht.lib
 
     public struct SupportedLanguagePairsResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public GetQuoteResultType[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public GetQuoteResultType[] results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code == 0 ? status.Msg : status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct SupportedLanguagePairsResultType
     {
-
-        public SupportedLanguagePairsSource[] source;
-
-        public SupportedLanguagePairsTargets[] targets;
+        [JsonProperty(PropertyName = "source")]
+        public SupportedLanguagePairsSource[] Source;
+        [JsonProperty(PropertyName = "targets")]
+        public SupportedLanguagePairsTargets[] Targets;
     }
     public struct SupportedLanguagePairsSource
     {
-        public string name;
-
-        public string code;
+        [JsonProperty(PropertyName = "name")]
+        public string Name;
+        [JsonProperty(PropertyName = "code")]
+        public string Code;
     }
     public struct SupportedLanguagePairsTargets
     {
-        public string name;
-        public string code;
-        public string availability;
+        [JsonProperty(PropertyName = "name")]
+        public string Name;
+        [JsonProperty(PropertyName = "code")]
+        public string Code;
+        [JsonProperty(PropertyName = "availability")]
+        public string Availability;
     }
 }

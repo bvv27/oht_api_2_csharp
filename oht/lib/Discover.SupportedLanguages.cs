@@ -1,30 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface ISupportedLanguagesProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey);
+    }
+    public class SupportedLanguagesProvider : ISupportedLanguagesProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/discover/languages?public_key={0}", publicKey);
+                return client.DownloadString(web);
+            }
+        }
+    }
+
     partial class Ohtapi
     {
-        public SupportedLanguagesResult SupportedLanguages(string public_key)
+        public ISupportedLanguagesProvider SupportedLanguagesProvider;
+
+        public SupportedLanguagesResult SupportedLanguages(string publicKey)
         {
             var r = new SupportedLanguagesResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = System.Text.Encoding.UTF8;
-                    var web = Url + String.Format("/discover/languages?public_key={0}", public_key);
-                    string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<SupportedLanguagesResult>(json);
-                }
+
+                if (SupportedLanguagesProvider == null)
+                    SupportedLanguagesProvider = new SupportedLanguagesProvider();
+                var json = SupportedLanguagesProvider.Get(Url, _proxy, KeyPublic);
+                r = JsonConvert.DeserializeObject<SupportedLanguagesResult>(json);
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -38,14 +56,16 @@ namespace oht.lib
 
     public struct SupportedLanguagesResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public SupportedLanguagesResultType[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public SupportedLanguagesResultType[] results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct SupportedLanguagesResultType

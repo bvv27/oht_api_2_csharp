@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -8,24 +6,24 @@ namespace oht.lib
 {
     partial class Ohtapi
     {
-        public TranslateViaMachineTranslationResult TranslateViaMachineTranslation(string source_language, string target_language, string source_content)
+        public TranslateViaMachineTranslationResult TranslateViaMachineTranslation(string sourceLanguage, string targetLanguage, string sourceContent)
         {
             var r = new TranslateViaMachineTranslationResult();
             try
             {
                 using (var client = new System.Net.WebClient())
                 {
-                    client.Encoding = System.Text.Encoding.UTF8;
+                    client.Encoding = Encoding.UTF8;
                     var web = Url + String.Format("/mt/translate/text?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&source_content={4}"
-                        , KeyPublic, KeySecret, source_language, target_language, source_content);
+                        , KeyPublic, KeySecret, sourceLanguage, targetLanguage, sourceContent);
                     string json = client.DownloadString(web);
                     r = JsonConvert.DeserializeObject<TranslateViaMachineTranslationResult>(json);
                 }
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -36,19 +34,23 @@ namespace oht.lib
 
     public struct TranslateViaMachineTranslationResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public TranslateViaMachineTranslationResultType Result;
+        [JsonProperty(PropertyName = "resultsArray")]
+        public string[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public TranslateViaMachineTranslationResultType results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code + " " + status.Msg + (status.Code == 0 ? " " + results.TranslatedText : "");
+            return Status.Code + " " + Status.Msg + (Status.Code == 0 ? " " + Result.TranslatedText : "");
         }
     }
     public struct TranslateViaMachineTranslationResultType
     {
-
+        [JsonProperty(PropertyName = "TranslatedText")]
         public string TranslatedText;
 
         

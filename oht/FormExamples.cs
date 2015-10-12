@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using oht.lib;
-using oht.Properties;
 
 namespace oht
 {
@@ -22,7 +15,7 @@ namespace oht
         {
             InitializeComponent();
 
-            Load();
+            LoadIni();
 
         }
 
@@ -35,15 +28,17 @@ namespace oht
         {
             if (checkRemember.Checked)
             {
-                File.WriteAllText(_fileIni, textPublicKey.Text + "|" + textSecretKey.Text + "|" + (checkSandbox.Checked ? "1" : "0") + "|" + textResources.Text + "|"
-                    + textGetQuoteResources.Text + "|" + combosource_language.Text + "|" + combotarget_language.Text + "|" + textProjectID.Text + "|" + comboExpertise.Text);
+                File.WriteAllText(_fileIni, textPublicKey.Text + @"|" + textSecretKey.Text + @"|" + (checkSandbox.Checked ? "1" : "0") 
+                    + @"|" + textResources.Text + @"|"+ textGetQuoteResources.Text + @"|" + combosource_language.Text 
+                    + @"|" + combotarget_language.Text + @"|" + textProjectID.Text + @"|" + comboExpertise.Text);
             }
             else
             {
                 File.WriteAllText(_fileIni, "");
             }
         }
-        void Load()
+
+        void LoadIni()
         {
             if (File.Exists(_fileIni))
             {
@@ -60,7 +55,7 @@ namespace oht
 
                 if (s[2] != "")
                 {
-                    checkSandbox.Checked = (s[2] == "1" ? true : false);
+                    checkSandbox.Checked = (s[2] == "1");
                     checkRemember.Checked = true;
                 }
             }
@@ -85,15 +80,15 @@ namespace oht
 
         private void butResources_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFile = new OpenFileDialog(); ;
+            OpenFileDialog openFile = new OpenFileDialog();
             if (openFile.ShowDialog() == DialogResult.OK)
             {
                 using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
                 {
                     FileInfo file = new FileInfo(openFile.FileName);
 
-                    var r = api.Resources(file.FullName, file.Name, "file_mime", "");
-                    textResources.Text = String.Join(",", r.results);
+                    var r = api.Resources(file.FullName, file.Name, "file_mime");
+                    textResources.Text = String.Join(",", r.Results);
                     textGetQuoteResources.Text = textResources.Text;
                     MessageBox.Show(r.ToString());
                 }
@@ -102,7 +97,7 @@ namespace oht
 
         private void butResourcesContent_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFile = new OpenFileDialog(); ;
+            OpenFileDialog openFile = new OpenFileDialog();
             if (openFile.ShowDialog() == DialogResult.OK)
             {
                 using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
@@ -111,7 +106,7 @@ namespace oht
 
                     var content = Encoding.Default.GetString(File.ReadAllBytes(openFile.FileName));
                     var r = api.Resources("", file.Name, "file_mime", content);
-                    textResourcesContent.Text = r.status.Code == 0 ? r.results[0] : "";
+                    textResourcesContent.Text = r.Status.Code == 0 ? r.Results[0] : "";
                     MessageBox.Show(r.ToString());
                 }
             }
@@ -127,7 +122,7 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.GetResource(textResources.Text);
-                textFileName.Text = r.results.file_name;
+                textFileName.Text = r.Result.FileName;
 
                 if (textFileName.Text == "")
                     textFileName.Text = String.Format("oht_{0}.txt", textResources.Text);
@@ -152,7 +147,7 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.DownloadResource(textResources.Text);
-                if (r.status.Code == 0)
+                if (r.Status.Code == 0)
                 {
                     SaveFileDialog saveFileDialog1 = new SaveFileDialog
                     {
@@ -163,7 +158,7 @@ namespace oht
 
                     if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                     {
-                        File.WriteAllBytes(saveFileDialog1.FileName, r.file);
+                        File.WriteAllBytes(saveFileDialog1.FileName, r.File);
                     }
                 }
 
@@ -179,12 +174,12 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.SupportedLanguages();
-                if (r.status.Code == 0)
+                if (r.Status.Code == 0)
                 {
                     comboLanguage.Items.Clear();
                     combosource_language.Items.Clear();
                     combotarget_language.Items.Clear();
-                    foreach (var str in r.results)
+                    foreach (var str in r.Results)
                     {
                         comboLanguage.Items.Add(str.LanguageCode + "|" + str.LanguageName);
                         combosource_language.Items.Add(str.LanguageCode);
@@ -263,7 +258,7 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.GetWordCount(textGetQuoteResources.Text);
-                textWordcount.Text = r.status.Code == 0 ? r.results.total.wordcount.ToString() : "";
+                textWordcount.Text = r.Status.Code == 0 ? r.Result.Total.Wordcount.ToString() : "";
 
 
                 MessageBox.Show(r.ToString());
@@ -325,13 +320,13 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.SupportedExpertises(combosource_language.Text, combotarget_language.Text);
-                if (r.status.Code == 0)
+                if (r.Status.Code == 0)
                 {
                     comboExpertise.Items.Clear();
 
-                    foreach (var str in r.results)
+                    foreach (var str in r.Results)
                     {
-                        comboExpertise.Items.Add(str.code + "-" + str.name);
+                        comboExpertise.Items.Add(str.Code + "-" + str.Name);
                     }
                 }
                 MessageBox.Show(r.ToString());
@@ -372,9 +367,9 @@ namespace oht
                     , "marketing-consumer-media"
                     , "", "", "", "translation");
 
-                if (r.status.Code == 0)
+                if (r.Status.Code == 0)
                 {
-                    textProjectID.Text = r.results.project_id.ToString();
+                    textProjectID.Text = r.Result.ProjectId.ToString();
                 }
                 MessageBox.Show(r.ToString());
             }
@@ -399,9 +394,9 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.CreateProofreadingProjectSource(combosource_language.Text, textGetQuoteResources.Text, "", "", "marketing-consumer-media", "", "namne12");
-                if (r.status.Code == 0)
+                if (r.Status.Code == 0)
                 {
-                    textProjectID.Text = r.results.project_id.ToString();
+                    textProjectID.Text = r.Result.ProjectId.ToString();
                 }
                 MessageBox.Show(r.ToString());
             }
@@ -456,9 +451,9 @@ namespace oht
             using (var api = new Ohtapi(textPublicKey.Text, textSecretKey.Text, checkSandbox.Checked))
             {
                 var r = api.CreateTranscriptionProject(combosource_language.Text, textGetQuoteResources.Text);
-                if (r.status.Code == 0)
+                if (r.Status.Code == 0)
                 {
-                    textProjectID.Text = r.results.project_id.ToString();
+                    textProjectID.Text = r.Result.ProjectId.ToString();
                 }
                 MessageBox.Show(r.ToString());
             }

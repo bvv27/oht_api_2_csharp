@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -8,15 +6,15 @@ namespace oht.lib
 {
     partial class Ohtapi
     {
-        public GetProjectDetailsResult GetProjectDetails(string project_id)
+        public GetProjectDetailsResult GetProjectDetails(string projectId)
         {
             var r = new GetProjectDetailsResult();
             try
             {
                 using (var client = new System.Net.WebClient())
                 {
-                    client.Encoding = System.Text.Encoding.UTF8;
-                    var web = Url + String.Format("/projects/" + project_id + "?public_key={0}&secret_key={1}"
+                    client.Encoding = Encoding.UTF8;
+                    var web = Url + String.Format("/projects/" + projectId + "?public_key={0}&secret_key={1}"
                         ,KeyPublic, KeySecret);
                     string json = client.DownloadString(web);
                     r = JsonConvert.DeserializeObject<GetProjectDetailsResult>(json);
@@ -24,8 +22,8 @@ namespace oht.lib
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -36,37 +34,54 @@ namespace oht.lib
 
     public struct GetProjectDetailsResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public GetProjectDetailsType Result;
+        [JsonProperty(PropertyName = "resultsArray")]
+        public string[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public GetProjectDetailsType results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code == 0 ? status.Msg : status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct GetProjectDetailsType
     {
-        public int project_id;
-        public string project_type;
-        public string project_status;
-        public string project_status_code;
-        public string source_language;
-        public string target_language;
-        public GetProjectDetailsResources resources;
-        public int wordcount;
-        public int length;
-        public string custom;
-
+        [JsonProperty(PropertyName = "project_id")]
+        public int ProjectId;
+        [JsonProperty(PropertyName = "project_type")]
+        public string ProjectType;
+        [JsonProperty(PropertyName = "project_status")]
+        public string ProjectStatus;
+        [JsonProperty(PropertyName = "project_status_code")]
+        public string ProjectStatusCode;
+        [JsonProperty(PropertyName = "source_language")]
+        public string SourceLanguage;
+        [JsonProperty(PropertyName = "target_language")]
+        public string TargetLanguage;
+        [JsonProperty(PropertyName = "resources")]
+        public GetProjectDetailsResources Resources;
+        [JsonProperty(PropertyName = "wordcount")]
+        public int Wordcount;
+        [JsonProperty(PropertyName = "length")]
+        public int Length;
+        [JsonProperty(PropertyName = "custom")]
+        public string Custom;
     }
 
     public struct GetProjectDetailsResources
     {
-        public string[] sources;
-        public string[] translations;
-        public string proofs;
-        public string transcriptions;
+        [JsonProperty(PropertyName = "sources")]
+        public string[] Sources;
+        [JsonProperty(PropertyName = "translations")]
+        public string[] Translations;
+        [JsonProperty(PropertyName = "proofs")]
+        public string Proofs;
+        [JsonProperty(PropertyName = "transcriptions")]
+        public string Transcriptions;
 
     }
 

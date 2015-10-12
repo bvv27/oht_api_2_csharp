@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -15,7 +13,7 @@ namespace oht.lib
             {
                 using (var client = new System.Net.WebClient())
                 {
-                    client.Encoding = System.Text.Encoding.UTF8;
+                    client.Encoding = Encoding.UTF8;
                     var web = Url + String.Format("/tools/wordcount?public_key={0}&secret_key={1}&resources={2}"
                         ,KeyPublic, KeySecret, resources);
                     string json = client.DownloadString(web);
@@ -24,8 +22,8 @@ namespace oht.lib
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -36,31 +34,39 @@ namespace oht.lib
 
     public struct GetWordCountResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public GetWordCountType Result;
+        [JsonProperty(PropertyName = "resultsArray")]
+        public string[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public GetWordCountType results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code == 0 ? status.Msg : status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct GetWordCountType
     {
-
-        public GetWordCountResources[] resources;
-        public GetWordCountTotal total;
+        [JsonProperty(PropertyName = "resources")]
+        public GetWordCountResources[] Resources;
+        [JsonProperty(PropertyName = "total")]
+        public GetWordCountTotal Total;
 
     }
 
     public struct GetWordCountResources
     {
-        public string resource;
-        public int wordcount;
+        [JsonProperty(PropertyName = "resource")]
+        public string Resource;
+        [JsonProperty(PropertyName = "wordcount")]
+        public int Wordcount;
     }
     public struct GetWordCountTotal
     {
-        public int wordcount;
+        [JsonProperty(PropertyName = "wordcount")]
+        public int Wordcount;
     }
 }

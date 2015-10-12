@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -8,22 +6,24 @@ namespace oht.lib
 {
     partial class Ohtapi
     {
-        public CreateTranscriptionProjectResult CreateTranscriptionProject(string source_language
-            , string sources, string length = "", string notes = "", string callback_url = "", string name = "")
+        public CreateTranscriptionProjectResult CreateTranscriptionProject(string sourceLanguage
+            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "")
         {
             var r = new CreateTranscriptionProjectResult();
             try
             {
                 using (var client = new System.Net.WebClient())
                 {
-                    client.Encoding = System.Text.Encoding.UTF8;
+                    client.Encoding = Encoding.UTF8;
                     var web = Url + String.Format("/projects/transcription?public_key={0}&secret_key={1}&source_language={2}&sources={3}&length={4}"
-                        , KeyPublic, KeySecret, source_language, sources, length);
-                    var values = new System.Collections.Specialized.NameValueCollection();
-                    
-                    values.Add("notes", notes);
-                    values.Add("callback_url", callback_url);
-                    values.Add("name", name);
+                        , KeyPublic, KeySecret, sourceLanguage, sources, length);
+                    var values = new System.Collections.Specialized.NameValueCollection
+                    {
+                        {"notes", notes},
+                        {"callback_url", callbackUrl},
+                        {"name", name}
+                    };
+
 
                     string json = Encoding.Default.GetString(client.UploadValues(web, "POST", values));
                     r = JsonConvert.DeserializeObject<CreateTranscriptionProjectResult>(json);
@@ -31,8 +31,8 @@ namespace oht.lib
             }
             catch (Exception err)
             {
-                r.status.Code = -1;
-                r.status.Msg = err.Message;
+                r.Status.Code = -1;
+                r.Status.Msg = err.Message;
             }
             return r;
         }
@@ -43,21 +43,28 @@ namespace oht.lib
 
     public struct CreateTranscriptionProjectResult
     {
+        [JsonProperty(PropertyName = "status")]
+        public StatusType Status;
+        [JsonProperty(PropertyName = "results")]
+        public CreateTranscriptionProjectType Result;
+        [JsonProperty(PropertyName = "resultsArray")]
+        public string[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
 
-        public StatusType status;
-        public CreateTranscriptionProjectType results;
-        public string[] errors;
-
-        public string ToString()
+        public override string ToString()
         {
-            return status.Code + " " + status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
     public struct CreateTranscriptionProjectType
     {
-        public int project_id;
-        public int length;
-        public decimal credits;
+        [JsonProperty(PropertyName = "project_id")]
+        public int ProjectId;
+        [JsonProperty(PropertyName = "length")]
+        public int Length;
+        [JsonProperty(PropertyName = "credits")]
+        public decimal Credits;
     }
 
 

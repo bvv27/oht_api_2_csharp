@@ -11,44 +11,44 @@ namespace oht.tests
         private const string ExpectedJsonResultOk = "{\"status\":{\"code\":0,\"msg\":\"ok\"},\"results\":{\"credits\":\"100000.0000\",\"account_id\":\"640\",\"account_username\":\"bvv27\",\"role\":\"customer\"},\"errors\":[]}";
         private const string ExpectedJsonResultErr = "{\"status\":{\"code\":101,\"msg\":\"unauthorized request - please include your public key \\/ account id and api secret key\"},\"results\":[],\"errors\":[]}";
         [Test, Description("Tests account")]
-        public void TestAccount()
+        public void Test()
         {
             Ohtapi ohtapi = new Ohtapi(Tools.TestPublicKey, Tools.TestSecretKey, true);
             Assert.IsNotNull(ohtapi);
 
-            AccountResult accountResult = ohtapi.Account();
+            var result = ohtapi.Account();
 
-            Assert.IsNotNull(accountResult);
-            Assert.AreEqual(0, accountResult.Status.Code);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Status.Code);
 
             ohtapi = new Ohtapi("","", true);
-            accountResult = ohtapi.Account();
+            result = ohtapi.Account();
 
-            Assert.IsNotNull(accountResult);
-            Assert.AreNotEqual(0, accountResult.Status.Code);
-            Assert.AreNotEqual(-1, accountResult.Status.Code);
+            Assert.IsNotNull(result);
+            Assert.AreNotEqual(0, result.Status.Code);
+            Assert.AreNotEqual(-1, result.Status.Code);
 
-            var accountProvider = Substitute.For<IAccountProvider>();
-            ohtapi.AccountProvider = accountProvider;
-            accountProvider.Get(string.Empty, null, string.Empty, string.Empty).ReturnsForAnyArgs(ExpectedJsonResultOk);
+            var provider = Substitute.For<IAccountProvider>();
+            ohtapi.AccountProvider = provider;
+            provider.Get(string.Empty, null, string.Empty, string.Empty).ReturnsForAnyArgs(ExpectedJsonResultOk);
             
-            accountResult = ohtapi.Account();
+            result = ohtapi.Account();
 
-            Assert.IsNotNull(accountResult);
-            Assert.AreEqual(0, accountResult.Status.Code);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Status.Code);
 
-            accountProvider.Get(string.Empty, null, string.Empty, string.Empty).ReturnsForAnyArgs(ExpectedJsonResultErr);
-            accountResult = ohtapi.Account();
+            provider.Get(string.Empty, null, string.Empty, string.Empty).ReturnsForAnyArgs(ExpectedJsonResultErr);
+            result = ohtapi.Account();
 
-            Assert.IsNotNull(accountResult);
-            Assert.AreNotEqual(0, accountResult.Status.Code);
-            Assert.AreNotEqual(-1, accountResult.Status.Code);
+            Assert.IsNotNull(result);
+            Assert.AreNotEqual(0, result.Status.Code);
+            Assert.AreNotEqual(-1, result.Status.Code);
 
-            accountProvider.Get(string.Empty, null, string.Empty, string.Empty).ReturnsForAnyArgs(string.Empty);
-            accountResult = ohtapi.Account();
+            provider.Get(string.Empty, null, string.Empty, string.Empty).ReturnsForAnyArgs(string.Empty);
+            result = ohtapi.Account();
 
-            Assert.IsNotNull(accountResult);
-            Assert.AreEqual(-1, accountResult.Status.Code);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(-1, result.Status.Code);
 
         }
     }
