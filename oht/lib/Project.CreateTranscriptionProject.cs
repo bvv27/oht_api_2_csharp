@@ -1,33 +1,63 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
-    partial class Ohtapi
+    public interface ICreateTranscriptionProjectProvider
     {
-        public CreateTranscriptionProjectResult CreateTranscriptionProject(string sourceLanguage
-            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "")
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string sourceLanguage
+            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "", string[] custom = null);
+    }
+    public class CreateTranscriptionProjectProvider : ICreateTranscriptionProjectProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string sourceLanguage
+            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "", string[] custom = null)
         {
-            var r = new CreateTranscriptionProjectResult();
-            try
+            using (var client = new WebClient())
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/projects/transcription?public_key={0}&secret_key={1}&source_language={2}&sources={3}&length={4}"
-                        , KeyPublic, KeySecret, sourceLanguage, sources, length);
-                    var values = new System.Collections.Specialized.NameValueCollection
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/projects/transcription?public_key={0}&secret_key={1}&source_language={2}&sources={3}&length={4}"
+                    , publicKey, secretKey, sourceLanguage, sources, length);
+                var values = new System.Collections.Specialized.NameValueCollection
                     {
                         {"notes", notes},
                         {"callback_url", callbackUrl},
                         {"name", name}
                     };
 
-
-                    string json = Encoding.Default.GetString(client.UploadValues(web, "POST", values));
-                    r = JsonConvert.DeserializeObject<CreateTranscriptionProjectResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
+                if (custom != null)
+                {
+                    for(var i = 0; i < custom.Length; i++)
+                    {
+                        values.Add("custom" + i, custom[i]);
+                    }
                 }
+
+
+                return Encoding.Default.GetString(client.UploadValues(web, "POST", values));
+            }
+        }
+    }
+
+    partial class Ohtapi
+    {
+        public ICreateTranscriptionProjectProvider CreateTranscriptionProjectProvider;
+
+        public CreateTranscriptionProjectResult CreateTranscriptionProject(string sourceLanguage
+            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "")
+        {
+            var r = new CreateTranscriptionProjectResult();
+            try
+            {
+
+                if (CreateTranscriptionProjectProvider == null)
+                    CreateTranscriptionProjectProvider = new CreateTranscriptionProjectProvider();
+                var json = CreateTranscriptionProjectProvider.Get(Url, _proxy, KeyPublic, KeySecret, sourceLanguage, sources, length, notes, callbackUrl, name);
+                r = JsonConvert.DeserializeObject<CreateTranscriptionProjectResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
             }
             catch (Exception err)
             {
@@ -61,7 +91,7 @@ namespace oht.lib
     {
         [JsonProperty(PropertyName = "project_id")]
         public int ProjectId;
-        [JsonProperty(PropertyName = "length")]
+        [JsonProperty(PropertyName = "wordcount")]
         public int Length;
         [JsonProperty(PropertyName = "credits")]
         public decimal Credits;

@@ -1,39 +1,56 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface ICreateFileResourceProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string upload, string fileName = "", string fileMime = "", string fileContent = "");
+    }
+    public class CreateFileResourceProvider : ICreateFileResourceProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string upload, string fileName = "", string fileMime = "", string fileContent = "")
+        {
+            using (var client = new WebClient())
+            {
+                    if (proxy != null)
+                    client.Proxy = proxy;
+
+                client.Encoding = Encoding.UTF8;
+                if (String.IsNullOrWhiteSpace(fileContent))
+                {
+                    var web = url + String.Format("/resources/file?public_key={0}&secret_key={1}&file_name={2}&file_mime={3}", publicKey, secretKey, fileName, fileMime);
+                    byte[] json = client.UploadFile(web, upload);
+                    return Encoding.UTF8.GetString(json);
+                }
+                else
+                {
+                    var web = url + String.Format("/resources/file?public_key={0}&secret_key={1}&file_name={2}&file_mime={3}", publicKey, secretKey, fileName, fileMime);
+
+                    var values = new System.Collections.Specialized.NameValueCollection
+                        {
+                            {"file_content", fileContent}
+                        };
+                    return Encoding.Default.GetString(client.UploadValues(web, values));
+                }
+            }
+        }
+    }
+
     partial class Ohtapi
     {
-        public CreateFileResourceResult Resources(string upload, string fileName = "", string fileMime = "", string fileContent = "")
+        public ICreateFileResourceProvider CreateFileResourceProvider;
+        public CreateFileResourceResult CreateFileResources(string upload, string fileName = "", string fileMime = "", string fileContent = "")
         {
             var r = new CreateFileResourceResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    if (String.IsNullOrWhiteSpace(fileContent))
-                    {
-                        var web = Url + String.Format("/resources/file?public_key={0}&secret_key={1}&file_name={2}&file_mime={3}", KeyPublic, KeySecret, fileName, fileMime);
-                        byte[] json = client.UploadFile(web, upload);
-                        r = JsonConvert.DeserializeObject<CreateFileResourceResult>(Encoding.UTF8.GetString(json));
-                    }
-                    else
-                    {
-                        var web = Url + String.Format("/resources/file?public_key={0}&secret_key={1}&file_name={2}&file_mime={3}", KeyPublic, KeySecret, fileName, fileMime);
-
-                        var values = new System.Collections.Specialized.NameValueCollection
-                        {
-                            {"file_content", fileContent}
-                        };
-                        string json = Encoding.Default.GetString(client.UploadValues(web, values));
-                        r = JsonConvert.DeserializeObject<CreateFileResourceResult>(json);
-                    }
-
-
-                }
+                if (CreateFileResourceProvider == null)
+                    CreateFileResourceProvider = new CreateFileResourceProvider();
+                var json = CreateFileResourceProvider.Get(Url, _proxy, KeyPublic, KeySecret, upload, fileName, fileMime, fileContent);
+                r = JsonConvert.DeserializeObject<CreateFileResourceResult>(json);
             }
             catch (Exception err)
             {

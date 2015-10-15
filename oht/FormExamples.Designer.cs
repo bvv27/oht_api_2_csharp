@@ -85,6 +85,7 @@
             this.butCreateTranslationProject = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.butSignIn = new System.Windows.Forms.Button();
+            this.butPostProjectRatings = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -465,6 +466,7 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.butPostProjectRatings);
             this.groupBox5.Controls.Add(this.butPostNewComment);
             this.groupBox5.Controls.Add(this.textComment);
             this.groupBox5.Controls.Add(this.label10);
@@ -636,6 +638,16 @@
             this.butSignIn.UseVisualStyleBackColor = true;
             this.butSignIn.Click += new System.EventHandler(this.butSignIn_Click);
             // 
+            // butPostProjectRatings
+            // 
+            this.butPostProjectRatings.Location = new System.Drawing.Point(360, 80);
+            this.butPostProjectRatings.Name = "butPostProjectRatings";
+            this.butPostProjectRatings.Size = new System.Drawing.Size(135, 28);
+            this.butPostProjectRatings.TabIndex = 39;
+            this.butPostProjectRatings.Text = "Post project ratings ";
+            this.butPostProjectRatings.UseVisualStyleBackColor = true;
+            this.butPostProjectRatings.Click += new System.EventHandler(this.butPostProjectRatings_Click);
+            // 
             // FormExamples
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -726,6 +738,7 @@
         private System.Windows.Forms.ComboBox comboExpertise;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button butSignIn;
+        private System.Windows.Forms.Button butPostProjectRatings;
     }
 }
 

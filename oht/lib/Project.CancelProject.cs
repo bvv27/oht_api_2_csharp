@@ -1,25 +1,45 @@
 ﻿using System;
+using System.Net;
+using System.Security.Policy;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface ICancelProjectProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId);
+    }
+    public class CancelProjectProvider : ICancelProjectProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/projects/" + projectId + "?public_key={0}&secret_key={1}"
+                    , publicKey, secretKey);
+
+                return client.UploadString(web, "DELETE", "");
+            }
+        }
+    }
+
     partial class Ohtapi
     {
+        public ICancelProjectProvider CancelProjectProvider;
+
         public CancelProjectResult CancelProject(string projectId)
         {
             var r = new CancelProjectResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/projects/" + projectId + "?public_key={0}&secret_key={1}"
-                        ,KeyPublic, KeySecret);
-                    
-                    string json = client.UploadString(web, "DELETE", "");
-                    r = JsonConvert.DeserializeObject<CancelProjectResult>(json);
-                }
+                if (CancelProjectProvider == null)
+                    CancelProjectProvider = new CancelProjectProvider();
+                var json = CancelProjectProvider.Get(Url, _proxy, KeyPublic, KeySecret, projectId);
+                r = JsonConvert.DeserializeObject<CancelProjectResult>(json);
             }
             catch (Exception err)
             {

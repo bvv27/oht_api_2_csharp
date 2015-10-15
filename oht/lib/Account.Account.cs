@@ -62,7 +62,7 @@ namespace oht.lib
         [JsonProperty(PropertyName = "results")]
         public AccountResultType Result;
         [JsonProperty(PropertyName = "resultsArray")]
-        public AccountResultType[] Results;
+        public string[] Results;
         [JsonProperty(PropertyName = "errors")]
         public string[] Errors;
 

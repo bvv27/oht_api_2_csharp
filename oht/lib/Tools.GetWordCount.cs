@@ -1,24 +1,42 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface IGetWordCountProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string resources);
+    }
+    public class GetWordCountProvider : IGetWordCountProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string resources)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/tools/wordcount?public_key={0}&secret_key={1}&resources={2}"
+                    , publicKey, secretKey, resources);
+                return client.DownloadString(web);
+            }
+        }
+    }
+
     partial class Ohtapi
     {
+        public IGetWordCountProvider GetWordCountProvider;
         public GetWordCountResult GetWordCount(string resources)
         {
             var r = new GetWordCountResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/tools/wordcount?public_key={0}&secret_key={1}&resources={2}"
-                        ,KeyPublic, KeySecret, resources);
-                    string json = client.DownloadString(web);
-                    r = JsonConvert.DeserializeObject<GetWordCountResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
-                }
+                if (GetWordCountProvider == null)
+                    GetWordCountProvider = new GetWordCountProvider();
+                var json = GetWordCountProvider.Get(Url, _proxy, KeyPublic, KeySecret, resources);
+                r = JsonConvert.DeserializeObject<GetWordCountResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
             }
             catch (Exception err)
             {

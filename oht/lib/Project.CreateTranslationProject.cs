@@ -1,25 +1,30 @@
 ﻿using System;
+using System.Net;
+using System.Security.Policy;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
-    partial class Ohtapi
+    public interface ICreateTranslationProjectProvider
     {
-        public CreateTranslationProjectResult CreateTranslationProject(string sourceLanguage, string targetLanguage
-            ,string sources, string expertise, string wordcount="", string notes="", string callbackUrl="", string name="")
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string sourceLanguage, string targetLanguage
+            , string sources, string expertise, string wordcount = "", string notes = "", string callbackUrl = "", string name = "");
+    }
+    public class CreateTranslationProjectProvider : ICreateTranslationProjectProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string sourceLanguage, string targetLanguage
+            , string sources, string expertise, string wordcount = "", string notes = "", string callbackUrl = "", string name = "")
         {
-            var r = new CreateTranslationProjectResult();
-            try
+            using (var client = new WebClient())
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/projects/translation?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&sources={4}&expertise={5}"
-                        , KeyPublic, KeySecret, sourceLanguage, targetLanguage, sources, expertise);
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/projects/translation?public_key={0}&secret_key={1}&source_language={2}&target_language={3}&sources={4}&expertise={5}"
+                    , publicKey, secretKey, sourceLanguage, targetLanguage, sources, expertise);
 
-
-                    var values = new System.Collections.Specialized.NameValueCollection
+                var values = new System.Collections.Specialized.NameValueCollection
                     {
                         {"wordcount", wordcount},
                         {"notes", notes},
@@ -27,9 +32,24 @@ namespace oht.lib
                         {"name", name}
                     };
 
-                    string json = Encoding.Default.GetString(client.UploadValues(web,"POST", values));
-                    r = JsonConvert.DeserializeObject<CreateTranslationProjectResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
-                }
+                return Encoding.Default.GetString(client.UploadValues(web, "POST", values));
+            }
+        }
+    }
+    partial class Ohtapi
+    {
+        public ICreateTranslationProjectProvider CreateTranslationProjectProvider;
+
+        public CreateTranslationProjectResult CreateTranslationProject(string sourceLanguage, string targetLanguage
+            , string sources, string expertise, string wordcount = "", string notes = "", string callbackUrl = "", string name = "")
+        {
+            var r = new CreateTranslationProjectResult();
+            try
+            {
+                if (CreateTranslationProjectProvider == null)
+                    CreateTranslationProjectProvider = new CreateTranslationProjectProvider();
+                var json = CreateTranslationProjectProvider.Get(Url, _proxy, KeyPublic, KeySecret, sourceLanguage, targetLanguage, sources, expertise, wordcount, notes, callbackUrl, name);
+                r = JsonConvert.DeserializeObject<CreateTranslationProjectResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
             }
             catch (Exception err)
             {

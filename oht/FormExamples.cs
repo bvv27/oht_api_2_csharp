@@ -85,7 +85,7 @@ namespace oht
             {
                 FileInfo file = new FileInfo(openFile.FileName);
 
-                var r = _api.Resources(file.FullName, file.Name, "file_mime");
+                var r = _api.CreateFileResources(file.FullName, file.Name, "file_mime","tree");
                 textResources.Text = String.Join(",", r.Results);
                 textGetQuoteResources.Text = textResources.Text;
                 MessageBox.Show(r.ToString());
@@ -100,7 +100,7 @@ namespace oht
                 FileInfo file = new FileInfo(openFile.FileName);
 
                 var content = Encoding.Default.GetString(File.ReadAllBytes(openFile.FileName));
-                var r = _api.Resources("", file.Name, "file_mime", content);
+                var r = _api.CreateFileResources("", file.Name, "file_mime", content);
                 textResourcesContent.Text = r.Status.Code == 0 ? r.Results[0] : "";
                 MessageBox.Show(r.ToString());
             }
@@ -363,7 +363,7 @@ namespace oht
                 return;
             }
 
-
+            //http://sandbox.onehourtranslation.com/api/2/projects/proof-general?notes=&sources=rsc-5618b9e3e272e2-73253523&secret_key=35aec76f5d9a015304173d1d81891f65&expertise=marketing-consumer-media&name=unittest+proof_translated+2015-10-13+17%3A23-02&source_language=en-us&callbackUrl=&public_key=c7t9NbMpG2xK6nvD834B&wordCount=0
             var r = _api.CreateProofreadingProjectSource(combosource_language.Text, textGetQuoteResources.Text, "", "", "marketing-consumer-media", "", "namne12");
             if (r.Status.Code == 0)
             {
@@ -396,7 +396,7 @@ namespace oht
             }
 
 
-            var r = _api.CreateProofreadingProjectSourceAndTarget(combosource_language.Text, combotarget_language.Text, textGetQuoteResources.Text, "");
+            var r = _api.CreateProofreadingProjectSourceAndTarget(combosource_language.Text, combotarget_language.Text, "rsc-560e7ea4650793-27822858", "rsc-560ea011277cb3-18000700");
             MessageBox.Show(r.ToString());
 
         }
@@ -497,6 +497,19 @@ namespace oht
             var r = _api.PostNewProjectComment(textProjectID.Text, textComment.Text);
             MessageBox.Show(r.ToString());
 
+        }
+
+        private void butPostProjectRatings_Click(object sender, EventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(textProjectID.Text))
+            {
+                tools.SetMsg("enter", textProjectID);
+                return;
+            }
+
+
+            var r = _api.PostProjectRatings(textProjectID.Text,"Customer", 1, "remarks");
+            MessageBox.Show(r.ToString());
         }
 
 

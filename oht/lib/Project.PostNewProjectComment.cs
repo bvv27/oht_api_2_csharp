@@ -1,26 +1,44 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface IPostNewProjectCommentProvider
+    {
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId, string content);
+    }
+    public class PostNewProjectCommentProvider : IPostNewProjectCommentProvider
+    {
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId, string content)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/projects/" + projectId + "/comments?public_key={0}&secret_key={1}", publicKey, secretKey);
+
+                var values = new System.Collections.Specialized.NameValueCollection { { "content", content } };
+                return Encoding.Default.GetString(client.UploadValues(web, "POST", values));
+            }
+        }
+    }
     partial class Ohtapi
     {
+        public IPostNewProjectCommentProvider PostNewProjectCommentProvider;
         public PostNewProjectCommentResult PostNewProjectComment(string projectId, string content)
         {
             var r = new PostNewProjectCommentResult();
             try
             {
-                using (var client = new System.Net.WebClient())
-                {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/projects/" + projectId + "/comments?public_key={0}&secret_key={1}"
-                        , KeyPublic, KeySecret);
+                if (PostNewProjectCommentProvider == null)
+                    PostNewProjectCommentProvider = new PostNewProjectCommentProvider();
+                var json = PostNewProjectCommentProvider.Get(Url, _proxy, KeyPublic, KeySecret, projectId, content);
+                r = JsonConvert.DeserializeObject<PostNewProjectCommentResult>(json);
 
-                    var values = new System.Collections.Specialized.NameValueCollection {{"content", content}};
-                    string json = Encoding.Default.GetString(client.UploadValues(web, "POST", values));
-                    r = JsonConvert.DeserializeObject<PostNewProjectCommentResult>(json);
-                }
+
             }
             catch (Exception err)
             {
@@ -45,7 +63,7 @@ namespace oht.lib
 
         public override string ToString()
         {
-            return Status.Code == 0 ? Status.Msg  : Status.Code + " " + Status.Msg;
+            return Status.Code == 0 ? Status.Msg : Status.Code + " " + Status.Msg;
         }
     }
 

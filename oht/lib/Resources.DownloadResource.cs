@@ -1,25 +1,50 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 
 namespace oht.lib
 {
+    public interface IDownloadResourceProvider
+    {
+        byte[] Get(string url, WebProxy proxy, string publicKey, string secretKey, string resourceUuid, int projectId = 0);
+    }
+    public class DownloadResourceProvider : IDownloadResourceProvider
+    {
+        public byte[] Get(string url, WebProxy proxy, string publicKey, string secretKey, string resourceUuid, int projectId = 0)
+        {
+            using (var client = new WebClient())
+            {
+                if (proxy != null)
+                    client.Proxy = proxy;
+                client.Encoding = Encoding.UTF8;
+                var web = url + String.Format("/resources/" + resourceUuid + "/download?public_key={0}&secret_key={1}&project_id={2}", publicKey, secretKey, projectId);
+                return client.DownloadData(web);
+            }
+        }
+    }
+
     partial class Ohtapi
     {
+        public IDownloadResourceProvider DownloadResourceProvider;
         public DownloadResourceResult DownloadResource(string resourceUuid, int projectId = 0)
         {
             var r = new DownloadResourceResult();
             try
             {
-                using (var client = new System.Net.WebClient())
+                if (DownloadResourceProvider == null)
+                    DownloadResourceProvider = new DownloadResourceProvider();
+                byte[] file = DownloadResourceProvider.Get(Url, _proxy, KeyPublic, KeySecret, resourceUuid, projectId);
+
+
+                var json = System.Text.Encoding.UTF8.GetString(file);
+                if (json.StartsWith("{\"status\":{\""))
                 {
-                    client.Encoding = Encoding.UTF8;
-                    var web = Url + String.Format("/resources/" + resourceUuid + "/download?public_key={0}&secret_key={1}&project_id={2}", KeyPublic, KeySecret, projectId);
-                    r.File = client.DownloadData(web);
-                    r.Status.Code = 0;
-                    r.Status.Msg = "ok";
-                    
+                    return JsonConvert.DeserializeObject<DownloadResourceResult>(json);
                 }
+                r.File = file;
+                r.Status.Code = 0;
+                r.Status.Msg = "ok";
             }
             catch (Exception err)
             {
@@ -36,6 +61,10 @@ namespace oht.lib
         public StatusType Status;
         [JsonProperty(PropertyName = "file")]
         public byte[] File;
+        [JsonProperty(PropertyName = "results")]
+        public string[] Results;
+        [JsonProperty(PropertyName = "errors")]
+        public string[] Errors;
         
         public override string ToString()
         {
