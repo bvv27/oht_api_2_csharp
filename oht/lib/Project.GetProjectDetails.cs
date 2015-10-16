@@ -109,7 +109,7 @@ namespace oht.lib
         /// Translation | Expert Translation | Proofreading | Transcription | Translation + Proofreading |
         /// </summary>
         [JsonProperty(PropertyName = "project_type")]
-        public string ProjectType;
+        public StringProjectType ProjectType;
         [JsonProperty(PropertyName = "project_status")]
         public string ProjectStatus;
         /// <summary>
@@ -121,7 +121,7 @@ namespace oht.lib
         /// completed - final state of the project, after which we cannot guarantee fixes or corrections. This state is automatically enforced after 4 days of inactivity on the project.
         /// </summary>
         [JsonProperty(PropertyName = "project_status_code")]
-        public string ProjectStatusCode;
+        public StringProjectStatusCode ProjectStatusCode;
         /// <summary>
         /// See Language Codes
         /// </summary>

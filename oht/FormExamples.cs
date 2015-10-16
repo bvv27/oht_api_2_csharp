@@ -222,7 +222,7 @@ namespace oht
             }
 
 
-            var r = _api.GetQuote(textGetQuoteResources.Text, textWordcount.Text, combosource_language.Text, combotarget_language.Text);
+            var r = _api.GetQuote(textGetQuoteResources.Text, textWordcount.Text, combosource_language.Text, combotarget_language.Text, StringService.None, "", StringProofreading.None, StringCurrency.None);
             MessageBox.Show(r.ToString());
 
         }
@@ -508,7 +508,7 @@ namespace oht
             }
 
 
-            var r = _api.PostProjectRatings(textProjectID.Text,"Customer", 1, "remarks");
+            var r = _api.PostProjectRatings(textProjectID.Text, StringType.Customer, 1, "remarks");
             MessageBox.Show(r.ToString());
         }
 

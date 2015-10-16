@@ -18,7 +18,7 @@ namespace oht.tests
             Assert.IsNotNull(ohtapi);
 
             ohtapi = new Ohtapi("","", true);
-            var result = ohtapi.PostProjectRatings(string.Empty, string.Empty, 0);
+            var result = ohtapi.PostProjectRatings(string.Empty, StringType.None, 0);
 
             Assert.IsNotNull(result);
             Assert.AreNotEqual(0, result.Status.Code);
@@ -26,22 +26,22 @@ namespace oht.tests
 
             var provider = Substitute.For<IPostProjectRatingsProvider>();
             ohtapi.PostProjectRatingsProvider = provider;
-            provider.Get(string.Empty, null, string.Empty, string.Empty, string.Empty, string.Empty, 0).ReturnsForAnyArgs(ExpectedJsonResultOk);
+            provider.Get(string.Empty, null, string.Empty, string.Empty, string.Empty, StringType.None, 0).ReturnsForAnyArgs(ExpectedJsonResultOk);
 
-            result = ohtapi.PostProjectRatings(string.Empty, string.Empty, 0);
+            result = ohtapi.PostProjectRatings(string.Empty, StringType.None, 0);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Status.Code);
 
-            provider.Get(string.Empty, null, string.Empty, string.Empty, string.Empty, string.Empty, 0).ReturnsForAnyArgs(ExpectedJsonResultErr);
-            result = ohtapi.PostProjectRatings(string.Empty, string.Empty, 0);
+            provider.Get(string.Empty, null, string.Empty, string.Empty, string.Empty, StringType.None, 0).ReturnsForAnyArgs(ExpectedJsonResultErr);
+            result = ohtapi.PostProjectRatings(string.Empty, StringType.None, 0);
 
             Assert.IsNotNull(result);
             Assert.AreNotEqual(0, result.Status.Code);
             Assert.AreNotEqual(-1, result.Status.Code);
 
-            provider.Get(string.Empty, null, string.Empty, string.Empty, string.Empty, string.Empty, 0).ReturnsForAnyArgs(string.Empty);
-            result = ohtapi.PostProjectRatings(string.Empty, string.Empty, 0);
+            provider.Get(string.Empty, null, string.Empty, string.Empty, string.Empty, StringType.None, 0).ReturnsForAnyArgs(string.Empty);
+            result = ohtapi.PostProjectRatings(string.Empty, StringType.None, 0);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(-1, result.Status.Code);

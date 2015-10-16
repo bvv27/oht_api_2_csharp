@@ -8,12 +8,12 @@ namespace oht.lib
     public interface IGetQuoteProvider
     {
         string Get(string url, WebProxy proxy, string publicKey, string secretKey, string resources, string wordcount, string sourceLanguage, string targetLanguage
-            , string service = "", string expertise = "", string proofreading = "", string currency = "");
+            , StringService service = StringService.None, string expertise = "", StringProofreading proofreading = StringProofreading.None, StringCurrency stringCurrency = StringCurrency.None);
     }
     public class GetQuoteProvider : IGetQuoteProvider
     {
         public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string resources, string wordcount, string sourceLanguage, string targetLanguage
-            , string service = "", string expertise = "", string proofreading = "", string currency = "")
+            , StringService service = StringService.None, string expertise = "", StringProofreading proofreading = StringProofreading.None, StringCurrency stringCurrency = StringCurrency.None)
         {
             using (var client = new WebClient())
             {
@@ -21,7 +21,7 @@ namespace oht.lib
                     client.Proxy = proxy;
                 client.Encoding = Encoding.UTF8;
                 var web = url + String.Format("/tools/quote?public_key={0}&secret_key={1}&resources={2}&wordcount={3}&source_language={4}&target_language={5}&service={6}&expertise={7}&proofreading={8}&currency={9}"
-                    , publicKey, secretKey, resources, wordcount, sourceLanguage, targetLanguage, service, expertise, proofreading, currency);
+                    , publicKey, secretKey, resources, wordcount, sourceLanguage, targetLanguage, service.GetStringValue(), expertise, proofreading.GetStringValue(), stringCurrency.GetStringValue());
                 return client.DownloadString(web);
             }
         }
@@ -40,17 +40,17 @@ namespace oht.lib
         /// <param name="service">[Optional] translation | proofreading | transproof | transcription (defaults to translation)</param>
         /// <param name="expertise">[Optional] See the list of Expertise Codes</param>
         /// <param name="proofreading">[Optional] 0 | 1</param>
-        /// <param name="currency">[Optional] USD | EUR</param>
+        /// <param name="stringCurrency">[Optional] USD | EUR</param>
         /// <returns></returns>
         public GetQuoteResult GetQuote(string resources, string wordcount, string sourceLanguage, string targetLanguage
-            , string service="", string expertise="", string proofreading="", string currency="")
+            , StringService service = StringService.None, string expertise = "", StringProofreading proofreading = StringProofreading.None, StringCurrency stringCurrency = StringCurrency.None)
         {
             var r = new GetQuoteResult();
             try
             {
                 if (GetQuoteProvider == null)
                     GetQuoteProvider = new GetQuoteProvider();
-                var json = GetQuoteProvider.Get(Url, _proxy, KeyPublic, KeySecret, resources, wordcount, sourceLanguage, targetLanguage, service, expertise, proofreading, currency);
+                var json = GetQuoteProvider.Get(Url, _proxy, KeyPublic, KeySecret, resources, wordcount, sourceLanguage, targetLanguage, service, expertise, proofreading, stringCurrency);
                 r = JsonConvert.DeserializeObject<GetQuoteResult>(json.Replace("\"results\":[", "\"resultsArray\":["));
             }
             catch (Exception err)

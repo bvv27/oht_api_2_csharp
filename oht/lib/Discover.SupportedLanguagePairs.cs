@@ -55,7 +55,7 @@ namespace oht.lib
         [JsonProperty(PropertyName = "status")]
         public StatusType Status;
         [JsonProperty(PropertyName = "results")]
-        public GetQuoteResultType[] Results;
+        public SupportedLanguagePairsResultType[] Results;
         [JsonProperty(PropertyName = "errors")]
         public string[] Errors;
 
@@ -67,7 +67,7 @@ namespace oht.lib
     public struct SupportedLanguagePairsResultType
     {
         [JsonProperty(PropertyName = "source")]
-        public SupportedLanguagePairsSource[] Source;
+        public SupportedLanguagePairsSource Source;
         [JsonProperty(PropertyName = "targets")]
         public SupportedLanguagePairsTargets[] Targets;
     }
@@ -94,6 +94,6 @@ namespace oht.lib
         ///availability - high | medium | low Details:	high = work is expected to start within an hour on business hours medium = work is expected to start within one day	low = work is expected to start within a week
         /// </summary>
         [JsonProperty(PropertyName = "availability")]
-        public string Availability;
+        public StringAvailability Availability;
     }
 }

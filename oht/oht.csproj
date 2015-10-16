@@ -63,6 +63,7 @@
       <DependentUpon>FormExamples.cs</DependentUpon>
     </Compile>
     <Compile Include="lib\Account.Account.cs" />
+    <Compile Include="lib\enums.cs" />
     <Compile Include="lib\MachineTranslation.DetectLanguageViaMachineTranslation.cs" />
     <Compile Include="lib\MachineTranslation.TranslateViaMachineTranslation.cs" />
     <Compile Include="lib\Discover.SupportedExpertises.cs" />

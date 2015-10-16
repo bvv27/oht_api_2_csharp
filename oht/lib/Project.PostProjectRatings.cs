@@ -7,18 +7,18 @@ namespace oht.lib
 {
     public interface IPostProjectRatingsProvider
     {
-        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId, string type, int rate, string remarks = "");
+        string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId, StringType type, int rate, string remarks = "");
     }
     public class PostProjectRatingsProvider : IPostProjectRatingsProvider
     {
-        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId, string type, int rate, string remarks = "")
+        public string Get(string url, WebProxy proxy, string publicKey, string secretKey, string projectId, StringType type, int rate, string remarks = "")
         {
             using (var client = new WebClient())
             {
                 if (proxy != null)
                     client.Proxy = proxy;
                 client.Encoding = Encoding.UTF8;
-                var web = url + String.Format("/projects/" + projectId + "/rating?public_key={0}&secret_key={1}&type={2}&rate={3}&remarks={4}", publicKey, secretKey, type, rate, remarks);
+                var web = url + String.Format("/projects/" + projectId + "/rating?public_key={0}&secret_key={1}&type={2}&rate={3}&remarks={4}", publicKey, secretKey, type.GetStringValue(), rate, remarks);
 
                 return client.DownloadString(web);
             }
@@ -36,7 +36,7 @@ namespace oht.lib
         /// <param name="rate">Rating of project (1 - being the lowest; 10 - being the highest)</param>
         /// <param name="remarks">Remark left with the rating</param>
         /// <returns></returns>
-        public PostProjectRatingsResult PostProjectRatings(string projectId, string type,int rate, string remarks="")
+        public PostProjectRatingsResult PostProjectRatings(string projectId, StringType type,int rate, string remarks="")
         {
             var r = new PostProjectRatingsResult();
             try
