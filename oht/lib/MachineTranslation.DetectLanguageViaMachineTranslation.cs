@@ -26,6 +26,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IDetectLanguageViaMachineTranslationProvider DetectLanguageViaMachineTranslationProvider;
+        /// <summary>
+        /// Detect language via machine translation
+        /// </summary>
+        /// <param name="sourceContent">Text for translation</param>
+        /// <returns></returns>
         public DetectLanguageViaMachineTranslationResult DetectLanguageViaMachineTranslation(string sourceContent)
         {
             var r = new DetectLanguageViaMachineTranslationResult();
@@ -64,6 +69,9 @@ namespace oht.lib
     }
     public struct DetectLanguageViaMachineTranslationResultType
     {
+        /// <summary>
+        /// See Language Codes
+        /// </summary>
         [JsonProperty(PropertyName = "language")]
         public string Language;
     }

@@ -39,7 +39,18 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ICreateTranslationProjectProvider CreateTranslationProjectProvider;
-
+        /// <summary>
+        /// Open a new translation project
+        /// </summary>
+        /// <param name="sourceLanguage">See Language Codes</param>
+        /// <param name="targetLanguage">See Language Codes</param>
+        /// <param name="sources">Comma separated list of Resource UUIDs</param>
+        /// <param name="expertise">[Optional] See Expertise Codes</param>
+        /// <param name="wordcount">[Optional] If empty use automatic counting</param>
+        /// <param name="notes">[Optional] Text note that will be shown to translator regarding the newly project</param>
+        /// <param name="callbackUrl">[Optional] See Callbacks section</param>
+        /// <param name="name">[Optional] Name your project. If empty, your project will be named automatically.</param>
+        /// <returns></returns>
         public CreateTranslationProjectResult CreateTranslationProject(string sourceLanguage, string targetLanguage
             , string sources, string expertise, string wordcount = "", string notes = "", string callbackUrl = "", string name = "")
         {
@@ -80,10 +91,19 @@ namespace oht.lib
     }
     public struct CreateTranslationProjectType
     {
+        /// <summary>
+        /// Unique id of the newly project created
+        /// </summary>
         [JsonProperty(PropertyName = "project_id")]
         public int ProjectId;
+        /// <summary>
+        /// Total word count of the newly project
+        /// </summary>
         [JsonProperty(PropertyName = "wordcount")]
         public int Wordcount;
+        /// <summary>
+        /// Total credit worth of the newly project
+        /// </summary>
         [JsonProperty(PropertyName = "credits")]
         public decimal Credits;
     }

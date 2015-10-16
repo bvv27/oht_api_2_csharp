@@ -30,7 +30,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ICancelProjectProvider CancelProjectProvider;
-
+        /// <summary>
+        /// Prevent a project from being worked on by a linguist Constraints: Available only before actual translation starts
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
         public CancelProjectResult CancelProject(string projectId)
         {
             var r = new CancelProjectResult();

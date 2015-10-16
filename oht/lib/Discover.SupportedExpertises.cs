@@ -26,6 +26,12 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ISupportedExpertisesProvider SupportedExpertisesProvider;
+        /// <summary>
+        /// Discover which expertises are supported by OHT
+        /// </summary>
+        /// <param name="sourceLanguage">(optional , mandatory if target_language is specified); See Language Codes</param>
+        /// <param name="targetLanguage">(optional , mandatory if source_language is specified); See Language Codes</param>
+        /// <returns></returns>
         public SupportedExpertisesResult SupportedExpertises(string sourceLanguage, string targetLanguage)
         {
             var r = new SupportedExpertisesResult();
@@ -63,8 +69,14 @@ namespace oht.lib
     }
     public struct SupportedExpertisesResultType
     {
+        /// <summary>
+        /// see expertise name here: expertise codes
+        /// </summary>
         [JsonProperty(PropertyName = "name")]
         public string Name;
+        /// <summary>
+        /// see expertise code here : expertise codes
+        /// </summary>
         [JsonProperty(PropertyName = "code")]
         public string Code;
     }

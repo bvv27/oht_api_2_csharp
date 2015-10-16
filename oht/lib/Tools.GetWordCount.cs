@@ -28,6 +28,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IGetWordCountProvider GetWordCountProvider;
+        /// <summary>
+        /// Get the word count of provided resources
+        /// </summary>
+        /// <param name="resources">a comma (,) separated list of resource_uuid</param>
+        /// <returns></returns>
         public GetWordCountResult GetWordCount(string resources)
         {
             var r = new GetWordCountResult();
@@ -68,8 +73,14 @@ namespace oht.lib
     }
     public struct GetWordCountType
     {
+        /// <summary>
+        /// Array of results per resource
+        /// </summary>
         [JsonProperty(PropertyName = "resources")]
         public GetWordCountResources[] Resources;
+        /// <summary>
+        /// total words count
+        /// </summary>
         [JsonProperty(PropertyName = "total")]
         public GetWordCountTotal Total;
 
@@ -77,13 +88,22 @@ namespace oht.lib
 
     public struct GetWordCountResources
     {
+        /// <summary>
+        /// UUID of the resource in list
+        /// </summary>
         [JsonProperty(PropertyName = "resource")]
         public string Resource;
+        /// <summary>
+        /// total resource word count
+        /// </summary>
         [JsonProperty(PropertyName = "wordcount")]
         public int Wordcount;
     }
     public struct GetWordCountTotal
     {
+        /// <summary>
+        /// total words count
+        /// </summary>
         [JsonProperty(PropertyName = "wordcount")]
         public int Wordcount;
     }

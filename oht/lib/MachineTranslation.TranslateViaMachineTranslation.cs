@@ -27,7 +27,13 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ITranslateViaMachineTranslationProvider TranslateViaMachineTranslationProvider;
-
+        /// <summary>
+        /// Translate via machine translation
+        /// </summary>
+        /// <param name="sourceLanguage">See Language Codes</param>
+        /// <param name="targetLanguage">See Language Codes</param>
+        /// <param name="sourceContent">Text for translation</param>
+        /// <returns></returns>
         public TranslateViaMachineTranslationResult TranslateViaMachineTranslation(string sourceLanguage, string targetLanguage, string sourceContent)
         {
             var r = new TranslateViaMachineTranslationResult();
@@ -66,10 +72,11 @@ namespace oht.lib
     }
     public struct TranslateViaMachineTranslationResultType
     {
+        /// <summary>
+        /// The translated content in the original format
+        /// </summary>
         [JsonProperty(PropertyName = "TranslatedText")]
-        public string TranslatedText;
-
-        
+        public string TranslatedText;     
     }
 
 }

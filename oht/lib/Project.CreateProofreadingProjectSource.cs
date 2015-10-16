@@ -41,13 +41,25 @@ namespace oht.lib
             }
         }
     }
-    //http://sandbox.onehourtranslation.com/api/2/projects/proof-general?notes=&sources=rsc-5618b9e3e272e2-73253523&secret_key=35aec76f5d9a015304173d1d81891f65&expertise=marketing-consumer-media&name=unittest+proof_translated+2015-10-13+17%3A23-02&source_language=en-us&callbackUrl=&public_key=c7t9NbMpG2xK6nvD834B&wordCount=0
 
     partial class Ohtapi
     {
         public ICreateProofreadingProjectSourceProvider CreateProofreadingProjectSourceProvider;
+
+        /// <summary>
+        /// Create new proofreading project, same language
+        /// </summary>
+        /// <param name="sourceLanguage">See Language Codes</param>
+        /// <param name="sources">Comma separated list of Resource UUIDs</param>
+        /// <param name="wordcount">[Optional] If empty use automatic counting</param>
+        /// <param name="notes">[Optional] Text note that will be shown to translator regarding the newly project</param>
+        /// <param name="expertise">[Optional] See Expertise Codes</param>
+        /// <param name="callbackUrl">[Optional] See Callbacks section</param>
+        /// <param name="name">[Optional] Name your project. If empty, your project will be named automatically.</param>
+        /// <param name="custom">[Optional]</param>
+        /// <returns></returns>
         public CreateProofreadingProjectSourceResult CreateProofreadingProjectSource(string sourceLanguage
-            , string sources, string wordcount, string notes,string expertise, string callbackUrl, string name)
+            , string sources, string wordcount, string notes, string expertise, string callbackUrl, string name, string[] custom = null)
         {
             var r = new CreateProofreadingProjectSourceResult();
             try
@@ -87,10 +99,19 @@ namespace oht.lib
     }
     public struct CreateProofreadingProjectSourceType
     {
+        /// <summary>
+        /// Unique id of the newly project created
+        /// </summary>
         [JsonProperty(PropertyName = "project_id")]
         public int ProjectId;
+        /// <summary>
+        /// Total word count of the newly project
+        /// </summary>
         [JsonProperty(PropertyName = "wordcount")]
         public int Wordcount;
+        /// <summary>
+        /// Total credit worth of the newly project
+        /// </summary>
         [JsonProperty(PropertyName = "credits")]
         public decimal Credits;
     }

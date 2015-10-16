@@ -28,6 +28,14 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IPostProjectRatingsProvider PostProjectRatingsProvider;
+        /// <summary>
+        /// Submit the rating for the quality of the translation and service
+        /// </summary>
+        /// <param name="projectId">Unique id of the newly project created</param>
+        /// <param name="type">Customer|Service</param>
+        /// <param name="rate">Rating of project (1 - being the lowest; 10 - being the highest)</param>
+        /// <param name="remarks">Remark left with the rating</param>
+        /// <returns></returns>
         public PostProjectRatingsResult PostProjectRatings(string projectId, string type,int rate, string remarks="")
         {
             var r = new PostProjectRatingsResult();

@@ -28,6 +28,12 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IPostNewProjectCommentProvider PostNewProjectCommentProvider;
+        /// <summary>
+        /// Post a new project comment to the project page
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <param name="content">content (text)</param>
+        /// <returns></returns>
         public PostNewProjectCommentResult PostNewProjectComment(string projectId, string content)
         {
             var r = new PostNewProjectCommentResult();

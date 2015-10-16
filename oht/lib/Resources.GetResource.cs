@@ -27,6 +27,13 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IGetResourceProvider GetResourceProvider;
+        /// <summary>
+        /// Provides information regarding a specific resource 
+        /// </summary>
+        /// <param name="resourceUuid"></param>
+        /// <param name="projectId">(optional) Project ID, needed when requesting a resource that was uploaded by another user - e.g. as a project’s translation</param>
+        /// <param name="fetch">(optional) possible values: false - (default) do not fetch content ; base64 - fetch content, base64 encoded</param>
+        /// <returns></returns>
         public GetResourceResult GetResource(string resourceUuid, int projectId=0, string fetch="")
         {
             var r = new GetResourceResult();
@@ -65,16 +72,34 @@ namespace oht.lib
     }
     public struct GetResourceResultType
     {
+        /// <summary>
+        /// text|file
+        /// </summary>
         [JsonProperty(PropertyName = "type")]
         public string Type;
+        /// <summary>
+        /// file size in bytes
+        /// </summary>
         [JsonProperty(PropertyName = "length")]
         public Int64 Length;
+        /// <summary>
+        /// File name (only for files)
+        /// </summary>
         [JsonProperty(PropertyName = "file_name")]
         public string FileName;
+        /// <summary>
+        /// File mime (only for files)
+        /// </summary>
         [JsonProperty(PropertyName = "file_mime")]
         public string FileMime;
+        /// <summary>
+        /// URL to download as file (currently str link to the API call “Download resource”...)
+        /// </summary>
         [JsonProperty(PropertyName = "download_url")]
         public string DownloadUrl;
+        /// <summary>
+        /// base64 encoded (only if fetch=”base64”)
+        /// </summary>
         [JsonProperty(PropertyName = "content")]
         public string Content;
     }

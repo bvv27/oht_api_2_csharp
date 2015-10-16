@@ -27,6 +27,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IRetrieveProjectRatingsProvider RetrieveProjectRatingsProvider;
+        /// <summary>
+        /// Get the rating for the quality of the translation and service
+        /// </summary>
+        /// <param name="projectId">Unique id of the newly project created</param>
+        /// <returns></returns>
         public RetrieveProjectRatingsResult RetrieveProjectRatings(string projectId)
         {
             var r = new RetrieveProjectRatingsResult();
@@ -65,12 +70,24 @@ namespace oht.lib
     }
     public struct RetrieveProjectRatingsType
     {
+        /// <summary>
+        /// Customer|Service
+        /// </summary>
         [JsonProperty(PropertyName = "type")]
         public string Type;
+        /// <summary>
+        /// Rating of project (1 - being the lowest; 10 - being the highest)
+        /// </summary>
         [JsonProperty(PropertyName = "rate")]
         public int Rate;
+        /// <summary>
+        /// Remark left with the rating
+        /// </summary>
         [JsonProperty(PropertyName = "remarks")]
         public string Remarks;
+        /// <summary>
+        /// Date and time of last update to the rating
+        /// </summary>
         [JsonProperty(PropertyName = "date")]
         public string Date;
     }

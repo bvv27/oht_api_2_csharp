@@ -27,6 +27,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IGetProjectsCommentsProvider GetProjectsCommentsProvider;
+        /// <summary>
+        /// View projects posted on the project page
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
         public GetProjectsCommentsResult GetProjectsComments(string  projectId)
         {
             var r = new GetProjectsCommentsResult();
@@ -63,14 +68,32 @@ namespace oht.lib
     }
     public struct GetProjectsCommentsType
     {
+        /// <summary>
+        /// unique id of the comment
+        /// </summary>
         [JsonProperty(PropertyName = "id")]
         public int Id;
+        /// <summary>
+        /// The date the comment was created
+        /// </summary>
         [JsonProperty(PropertyName = "date")]
         public string Date;
+        /// <summary>
+        /// Short representation of the user’s name
+        /// </summary>
         [JsonProperty(PropertyName = "commenter_name")]
         public string CommenterName;
+        /// <summary>
+        /// admin | customer | provider | potential-provider
+        /// admin - OHT support team
+        /// provider - The translator / proofreader / transcriber that is assigned to the project
+        /// potential-provider - A translator / proofreader / transcriber that was allowed to view the project before it was assigned
+        /// </summary>
         [JsonProperty(PropertyName = "commenter_role")]
         public string CommenterRole;
+        /// <summary>
+        /// text content
+        /// </summary>
         [JsonProperty(PropertyName = "comment_content")]
         public string CommentContent;
     }

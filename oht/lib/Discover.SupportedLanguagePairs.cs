@@ -26,6 +26,10 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ISupportedLanguagePairsProvider SupportedLanguagePairsProvider;
+        /// <summary>
+        /// Discover which language pairs are supported by OHT
+        /// </summary>
+        /// <returns></returns>
         public SupportedLanguagePairsResult SupportedLanguagePairs()
         {
             var r = new SupportedLanguagePairsResult();
@@ -71,6 +75,9 @@ namespace oht.lib
     {
         [JsonProperty(PropertyName = "name")]
         public string Name;
+        /// <summary>
+        /// ●	code - See Language Codes
+        /// </summary>
         [JsonProperty(PropertyName = "code")]
         public string Code;
     }
@@ -78,8 +85,14 @@ namespace oht.lib
     {
         [JsonProperty(PropertyName = "name")]
         public string Name;
+        /// <summary>
+        /// ●	code - See Language Codes
+        /// </summary>
         [JsonProperty(PropertyName = "code")]
         public string Code;
+        /// <summary>
+        ///availability - high | medium | low Details:	high = work is expected to start within an hour on business hours medium = work is expected to start within one day	low = work is expected to start within a week
+        /// </summary>
         [JsonProperty(PropertyName = "availability")]
         public string Availability;
     }

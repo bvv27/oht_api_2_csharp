@@ -30,7 +30,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IGetProjectDetailsProvider GetProjectDetailsProvider;
-
+        /// <summary>
+        /// Receive project specifications 
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns></returns>
         public GetProjectDetailsResult GetProjectDetails(string projectId)
         {
             var r = new GetProjectDetailsResult();
@@ -96,22 +100,51 @@ namespace oht.lib
     }
     public struct GetProjectDetailsType
     {
+        /// <summary>
+        /// The unique id of the requested project
+        /// </summary>
         [JsonProperty(PropertyName = "project_id")]
         public int ProjectId;
+        /// <summary>
+        /// Translation | Expert Translation | Proofreading | Transcription | Translation + Proofreading |
+        /// </summary>
         [JsonProperty(PropertyName = "project_type")]
         public string ProjectType;
         [JsonProperty(PropertyName = "project_status")]
         public string ProjectStatus;
+        /// <summary>
+        /// Pending | in_progress | submitted | signed | completed | canceled
+        /// pending - project submitted to OHT, but professional worker (translator/proofreader) did not start working yet
+        /// in_progress - worker started working on this project
+        /// submitted - the worker uploaded the first target resource to the project. This does not mean that the project is completed.
+        /// signed - the worker declared (with his signature) that he finished working on this project and all resources have been uploaded.
+        /// completed - final state of the project, after which we cannot guarantee fixes or corrections. This state is automatically enforced after 4 days of inactivity on the project.
+        /// </summary>
         [JsonProperty(PropertyName = "project_status_code")]
         public string ProjectStatusCode;
+        /// <summary>
+        /// See Language Codes
+        /// </summary>
         [JsonProperty(PropertyName = "source_language")]
         public string SourceLanguage;
+        /// <summary>
+        /// See Language Code
+        /// </summary>
         [JsonProperty(PropertyName = "target_language")]
         public string TargetLanguage;
+        /// <summary>
+        /// Resource UUID lists of the project's sources, translations, proofs and transcriptions
+        /// </summary>
         [JsonProperty(PropertyName = "resources")]
         public GetProjectDetailsResources Resources;
+        /// <summary>
+        /// length - in seconds (transcription projects only);
+        /// </summary>
         [JsonProperty(PropertyName = "wordcount")]
         public int Wordcount;
+        /// <summary>
+        /// length - in seconds (transcription projects only);
+        /// </summary>
         [JsonProperty(PropertyName = "length")]
         public int Length;
         [JsonProperty(PropertyName = "custom")]
@@ -122,12 +155,24 @@ namespace oht.lib
 
     public struct GetProjectDetailsResources
     {
+        /// <summary>
+        /// List of source resource UUIDs related to the requested project
+        /// </summary>
         [JsonProperty(PropertyName = "sources")]
         public string[] Sources;
+        /// <summary>
+        /// List of translation resource UUIDs related to the requested project
+        /// </summary>
         [JsonProperty(PropertyName = "translations")]
         public string[] Translations;
+        /// <summary>
+        /// List of proofreading resource UUIDs related to the requested project
+        /// </summary>
         [JsonProperty(PropertyName = "proofs")]
         public string Proofs;
+        /// <summary>
+        /// List of transcription resource UUIDs related to the requested project
+        /// </summary>
         [JsonProperty(PropertyName = "transcriptions")]
         public string Transcriptions;
 

@@ -27,7 +27,11 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ISupportedLanguagesProvider SupportedLanguagesProvider;
-
+        /// <summary>
+        /// Discover which languages are supported by OHT
+        /// </summary>
+        /// <param name="publicKey"></param>
+        /// <returns></returns>
         public SupportedLanguagesResult SupportedLanguages(string publicKey)
         {
             var r = new SupportedLanguagesResult();
@@ -70,8 +74,14 @@ namespace oht.lib
     }
     public struct SupportedLanguagesResultType
     {
+        /// <summary>
+        /// for example, English ,French etc.
+        /// </summary>
         [JsonProperty(PropertyName = "name")]
         public string LanguageName;
+        /// <summary>
+        /// See Language Codes
+        /// </summary>
         [JsonProperty(PropertyName = "code")]
         public string LanguageCode;
 

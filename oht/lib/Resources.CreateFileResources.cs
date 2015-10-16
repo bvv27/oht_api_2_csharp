@@ -42,6 +42,14 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ICreateFileResourceProvider CreateFileResourceProvider;
+        /// <summary>
+        /// Create a new file entity from supported formats.
+        /// </summary>
+        /// <param name="upload">File content to upload, submitted via multipart/form-data request</param>
+        /// <param name="fileName">Replace the original file's name on One Hour Translation</param>
+        /// <param name="fileMime">Replace the default mime value for the file</param>
+        /// <param name="fileContent">Content of the new file, works only with "file_name" not empty. If used, actual upload is skipped.</param>
+        /// <returns></returns>
         public CreateFileResourceResult CreateFileResources(string upload, string fileName = "", string fileMime = "", string fileContent = "")
         {
             var r = new CreateFileResourceResult();

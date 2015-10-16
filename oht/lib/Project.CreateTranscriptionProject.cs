@@ -46,9 +46,19 @@ namespace oht.lib
     partial class Ohtapi
     {
         public ICreateTranscriptionProjectProvider CreateTranscriptionProjectProvider;
-
+        /// <summary>
+        /// Post a transcription project
+        /// </summary>
+        /// <param name="sourceLanguage">See Language Codes</param>
+        /// <param name="sources">Comma separated list of Resource UUIDs</param>
+        /// <param name="length">[Optional] Integer of seconds, if empty use automatic counting</param>
+        /// <param name="notes">[Optional] Text note that will be shown to translator regarding the newly project</param>
+        /// <param name="callbackUrl">[Optional] See Callbacks section</param>
+        /// <param name="name">[Optional] Name your project. If empty, your project will be named automatically.</param>
+        /// <param name="custom">[Optional]</param>
+        /// <returns></returns>
         public CreateTranscriptionProjectResult CreateTranscriptionProject(string sourceLanguage
-            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "")
+            , string sources, string length = "", string notes = "", string callbackUrl = "", string name = "", string[] custom = null)
         {
             var r = new CreateTranscriptionProjectResult();
             try
@@ -89,10 +99,19 @@ namespace oht.lib
     }
     public struct CreateTranscriptionProjectType
     {
+        /// <summary>
+        /// Unique id of the newly project created
+        /// </summary>
         [JsonProperty(PropertyName = "project_id")]
         public int ProjectId;
+        /// <summary>
+        /// Total length (in seconds) of the newly transcription project
+        /// </summary>
         [JsonProperty(PropertyName = "wordcount")]
         public int Length;
+        /// <summary>
+        /// Total credit worth of the newly project
+        /// </summary>
         [JsonProperty(PropertyName = "credits")]
         public decimal Credits;
     }

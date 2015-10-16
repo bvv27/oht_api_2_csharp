@@ -28,7 +28,7 @@ namespace oht.lib
     {
         public IAccountProvider AccountProvider;
         /// <summary>
-        /// Get account details
+        /// Fetch basic account details and credits balance
         /// </summary>
         /// <returns></returns>
         public AccountResult Account()

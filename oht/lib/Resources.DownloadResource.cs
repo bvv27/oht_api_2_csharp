@@ -27,6 +27,12 @@ namespace oht.lib
     partial class Ohtapi
     {
         public IDownloadResourceProvider DownloadResourceProvider;
+        /// <summary>
+        /// File is downloaded with original name, text content is downloaded with filename: “oht_<resource_uuid>.txt” 
+        /// </summary>
+        /// <param name="resourceUuid"></param>
+        /// <param name="projectId">(optional) Project ID, needed when requesting a resource that was uploaded by another user - e.g. as a project’s translation</param>
+        /// <returns></returns>
         public DownloadResourceResult DownloadResource(string resourceUuid, int projectId = 0)
         {
             var r = new DownloadResourceResult();
